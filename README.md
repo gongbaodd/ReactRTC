@@ -1,2 +1,0 @@
-# ReactRTC
-Created with CodeSandbox
