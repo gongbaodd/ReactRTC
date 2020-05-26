@@ -30,14 +30,26 @@ const createOffer = (conn: RTCPeerConnection) => async () => {
   return offer;
 };
 
-const setRemoteDescription = (conn: RTCPeerConnection) => async (data: RTCSessionDescriptionInit) => {
-  if (conn.currentRemoteDescription) {
-    console.log('[P2P] Got remote description', data);
+const acceptOffer = (conn: RTCPeerConnection) => 
+  async (offer: RTCSessionDescriptionInit) => {
+    await conn.setRemoteDescription(new RTCSessionDescription(offer));
+    const answer = await conn.createAnswer();
+    console.log('[P2P] created answer', answer);
 
-    const rtcSessionDescription = new RTCSessionDescription(data);
-    await conn.setRemoteDescription(rtcSessionDescription);
+    await conn.setLocalDescription(answer);
+
+    return answer;
+  };
+
+const setRemoteDescription = (conn: RTCPeerConnection) => 
+  async (data: RTCSessionDescriptionInit) => {
+    if (conn.currentRemoteDescription) {
+      console.log('[P2P] Got remote description', data);
+
+      const rtcSessionDescription = new RTCSessionDescription(data);
+      await conn.setRemoteDescription(rtcSessionDescription);
+    }
   }
-}
 
 
 const usePeerConnection = (
@@ -76,6 +88,7 @@ const usePeerConnection = (
     return {
       connection: conn, 
       createOffer: createOffer(conn), 
+      acceptOffer: acceptOffer(conn),
       setRemoteDescription: setRemoteDescription(conn),
     };
   }, [localStream, remoteStreams]);

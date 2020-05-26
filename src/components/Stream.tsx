@@ -5,10 +5,12 @@ import CardActions from "@material-ui/core/CardActions";
 import CardMedia from "@material-ui/core/CardMedia";
 import Button from "@material-ui/core/Button";
 import Video from "./Video";
+import RoomDialog from "./RoomDialog";
+
 import useUserMedia from "../hooks/useUserMedia";
 import usePeerConnection from "../hooks/usePeerConnection";
 import useIceCandidate from "../hooks/useIceCandidate";
-import { useRooms } from "../hooks/useDatabase";
+import { useRooms, getRoomCollection } from "../hooks/useDatabase";
 
 interface Props {
   remote?: boolean;
@@ -18,7 +20,12 @@ const Stream: FC<Props> = ({ remote }) => {
   const [roomId, setRoomId] = useState("");
   const { stream: localStream, setStream: setLocalStream } = useUserMedia();
   const [remoteStream] = useState(() => new MediaStream());
-  const { connection, createOffer, setRemoteDescription } = usePeerConnection(
+  const {
+    connection,
+    createOffer, 
+    acceptOffer,
+    setRemoteDescription,
+  } = usePeerConnection(
     localStream,
     remoteStream,
   );
@@ -36,6 +43,7 @@ const Stream: FC<Props> = ({ remote }) => {
   }, [roomRef, setRemoteDescription]);
 
   return (
+  <>
     <Card style={{ marginTop: "20px" }}>
       <CardHeader title={roomId || remote ? "remoteStream" : "localStream"} />
       <CardMedia style={{ height: 320 }}>
@@ -59,10 +67,24 @@ const Stream: FC<Props> = ({ remote }) => {
         >
           创建房间
         </Button>
-        <Button size="small">加入房间</Button>
+        <RoomDialog onJoinRoom={async id => {
+          const roomRef = (await getRoomCollection()).doc(id);
+          const roomSnapshot = await roomRef.get();
+
+          if(roomSnapshot.exists) {
+            console.log('Got room:', roomSnapshot.exists);
+            const offer = roomSnapshot.data()?.offer;
+            console.log('Got offer:', offer);
+            const answer = await acceptOffer(offer);
+            await roomRef.update({ answer: {type: answer.type, sdp: answer.sdp} });
+          }
+
+          return roomSnapshot.exists;
+        }}/>
         <Button size="small">挂断</Button>
       </CardActions>
     </Card>
+  </>
   );
 };
 

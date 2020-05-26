@@ -5,9 +5,14 @@ export type dbDocument = firebase.firestore.DocumentReference<
   firebase.firestore.DocumentData
 > | null;
 
-const getRoomRef = async () => {
+export const getRoomCollection = async () => {
   const db = firebase.firestore();
-  const roomRef = await db.collection("rooms").doc();
+  const collection = await db.collection("rooms");
+  return collection;
+};
+
+const getRoomRef = async () => {
+  const roomRef = (await getRoomCollection()).doc();
   return roomRef;
 };
 
