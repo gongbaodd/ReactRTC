@@ -4,7 +4,8 @@ import CardHeader from "@material-ui/core/CardHeader";
 import CardActions from "@material-ui/core/CardActions";
 import CardMedia from "@material-ui/core/CardMedia";
 import Button from "@material-ui/core/Button";
-import { LocalVideo, RemoteVideo } from "./Video";
+import LocalVideo from "./LocalVideo";
+import RemoteVideo from "./RemoteVideo";
 import RoomDialog from "./RoomDialog";
 
 import usePeerConnection from "../hooks/usePeerConnection";

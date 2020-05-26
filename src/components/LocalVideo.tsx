@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { useStreamToPeer } from "../hooks/usePeerConnection";
+import { useStreamToPeer } from "./PeerConnection";
 import useVideoMedia from "../hooks/useVideoMedia";
 import UserMedia, { useUserStream } from "./UserMedia";
 
@@ -20,6 +20,8 @@ export const LocalVideo: FC<LocalProps> = () => {
     </UserMedia>
   );
 };
+
+export default LocalVideo;
 
 interface RemoteProps {}
 

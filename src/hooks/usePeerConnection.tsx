@@ -65,7 +65,10 @@ const setRemoteDescription = (conn: RTCPeerConnection) =>
 export const useStreamToPeer = (localStream: MediaStream) => {
   const conn = useContext(PeerContext);
   useEffect(() => {
-    localStream.getTracks().forEach(t => conn?.addTrack(t, localStream));
+    localStream.getTracks().forEach(t => {
+      console.log('[P2P] stream to peer');
+      conn?.addTrack(t, localStream);
+    });
   }, [localStream, conn]);
 }
 
@@ -88,23 +91,23 @@ const usePeerConnection = (
     // localStream?.getTracks().forEach(track => conn?.addTrack(track, localStream));
 
     // download remote stream
-    conn?.addEventListener("track", event => {
-      console.log(`[P2P] Got remote track:`, event.streams[0]);
+    // conn?.addEventListener("track", event => {
+    //   console.log(`[P2P] Got remote track:`, event.streams[0]);
 
-      event.streams.forEach((s, streamIndex) =>
-        s.getTracks().forEach(track => {
-          if (remoteStreams[streamIndex]) {
-            const { id } = remoteStreams[streamIndex];
-            console.log(
-              `[P2P] Add a track to the remoteStream:${id}`,
-              track,
-            );
+    //   event.streams.forEach((s, streamIndex) =>
+    //     s.getTracks().forEach(track => {
+    //       if (remoteStreams[streamIndex]) {
+    //         const { id } = remoteStreams[streamIndex];
+    //         console.log(
+    //           `[P2P] Add a track to the remoteStream:${id}`,
+    //           track,
+    //         );
 
-            remoteStreams[streamIndex].addTrack(track);
-          }
-        }),
-      );
-    });
+    //         remoteStreams[streamIndex].addTrack(track);
+    //       }
+    //     }),
+    //   );
+    // });
 
     return {
       connection: conn, 
