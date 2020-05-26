@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from "react";
+import React, { FC, useState } from "react";
 import Card from "@material-ui/core/Card";
 import CardHeader from "@material-ui/core/CardHeader";
 import CardActions from "@material-ui/core/CardActions";
@@ -15,15 +15,19 @@ interface Props {
 }
 
 const Stream: FC<Props> = ({ remote }) => {
+  const [roomId, setRoomId] = useState("");
   const { stream: localStream, setStream: setLocalStream } = useUserMedia();
-  const remoteStream = useMemo(() => new MediaStream(), []);
-  const { connection } = usePeerConnection(localStream, remoteStream);
-  const roomRef = useRooms();
-  useIceCandidate(roomRef(), connection);
+  const [remoteStream] = useState(() => new MediaStream());
+  const { connection, createOffer } = usePeerConnection(
+    localStream,
+    remoteStream,
+  );
+  const getRoomRef = useRooms();
+  useIceCandidate(getRoomRef(), connection);
 
   return (
     <Card style={{ marginTop: "20px" }}>
-      <CardHeader title={remote ? "remoteStream" : "localStream"} />
+      <CardHeader title={roomId || remote ? "remoteStream" : "localStream"} />
       <CardMedia style={{ height: 320 }}>
         <Video stream={localStream} />
         <Video stream={remoteStream} />
@@ -32,7 +36,18 @@ const Stream: FC<Props> = ({ remote }) => {
         <Button size="small" onClick={() => setLocalStream()}>
           打开摄像头&麦克风
         </Button>
-        <Button size="small" onClick={() => null}>
+        <Button
+          size="small"
+          onClick={async () => {
+            const roomRef = getRoomRef();
+            if (roomRef) {
+              const { type, sdp } = await createOffer();
+              await roomRef.set({ offer: { type, sdp } });
+              setRoomId(roomRef.id);
+              console.log("created Room " + roomRef.id);
+            }
+          }}
+        >
           创建房间
         </Button>
         <Button size="small">加入房间</Button>

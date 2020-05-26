@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import config from "../configs/iceServers";
+import {dbDocument} from "./useDatabase";
 
 const listen = (conn: RTCPeerConnection) => {
   conn.addEventListener("icegatheringstatechange", () =>
@@ -19,6 +20,14 @@ const listen = (conn: RTCPeerConnection) => {
       `[P2P] ICE connection state change: ${conn.iceConnectionState}`,
     ),
   );
+};
+
+const createOffer = (conn: RTCPeerConnection) => async () => {
+  const offer = await conn.createOffer();
+  await conn.setLocalDescription(offer);
+
+  console.log('[P2P] created offer:', offer);
+  return offer;
 };
 
 
@@ -55,7 +64,7 @@ const usePeerConnection = (
     //   );
     // });
 
-    return {connection: conn};
+    return {connection: conn, createOffer: createOffer(conn)};
   }, [localStream, remoteStreams]);
 
 export default usePeerConnection;
