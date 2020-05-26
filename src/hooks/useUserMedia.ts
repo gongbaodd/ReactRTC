@@ -1,21 +1,16 @@
 import { useState } from "react";
 
-const setUserStream = (setStream: (s: MediaStream) => void) => {
-  navigator.mediaDevices
-    .getUserMedia({
-      video: true,
-      audio: true,
-    })
-    .then(s => setStream(s));
-};
-
 const useUserMedia = () => {
-  const [stream, setStream] = useState<MediaStream | null>(null);
+  const [stream, setStream] = useState<MediaStream>(() => new MediaStream());
   const [, setPermitted] = useState(false);
 
-  const getPermitted = () => {
+  const getPermitted = async () => {
     setPermitted(true);
-    setUserStream(setStream);
+    const userStream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: true,
+    });
+    setStream(userStream);
   };
 
   return { stream, setStream: getPermitted };

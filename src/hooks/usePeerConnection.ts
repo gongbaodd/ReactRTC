@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import config from "../configs/iceServers";
 
 const listen = (conn: RTCPeerConnection) => {
@@ -54,14 +54,15 @@ const setRemoteDescription = (conn: RTCPeerConnection) =>
 const usePeerConnection = (
   localStream: null | MediaStream,
   ...remoteStreams: MediaStream[]
-) =>
-  useMemo(() => {
-    const conn = new RTCPeerConnection(config);
-   
-
+) =>{
+  const [conn] = useState(() => {
+    const c = new RTCPeerConnection(config);
     console.log("create connection", config);
-    listen(conn);
-
+    listen(c);
+    return c;
+  });
+  
+  return useMemo(() => {
     // upload local stream
     localStream?.getTracks().forEach(track => conn.addTrack(track, localStream));
 
@@ -90,6 +91,8 @@ const usePeerConnection = (
       acceptOffer: acceptOffer(conn),
       setRemoteDescription: setRemoteDescription(conn),
     };
-  }, [localStream, remoteStreams]);
+  }, [localStream, remoteStreams, conn]);
+}
+  
 
 export default usePeerConnection;

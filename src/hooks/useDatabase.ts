@@ -1,4 +1,4 @@
-import firebase from "firebase";
+import firebase from "../utils/firebase";
 import { useState, useEffect } from "react";
 
 export type dbDocument = firebase.firestore.DocumentReference<
