@@ -80,6 +80,8 @@ const Stream: FC<Props> = ({ remote }) => {
             calleeAddCandidates();
 
             console.log('Got room:', roomSnapshot.exists);
+            setRoomId(id);
+
             const offer = roomSnapshot.data()?.offer;
             console.log('Got offer:', offer);
             const answer = await acceptOffer(offer);
@@ -88,7 +90,27 @@ const Stream: FC<Props> = ({ remote }) => {
 
           return roomSnapshot.exists;
         }}/>
-        <Button size="small">挂断</Button>
+        <Button size="small" onClick={async () => {
+          if (roomId) {
+            localStream?.getTracks().forEach(track => track.stop());
+            remoteStream.getTracks().forEach(track => track.stop());
+            connection.close();
+
+            const roomRef = (await getRoomCollection()).doc(roomId);
+            const candidates = await Promise.all([
+              roomRef.collection('calleeCandidates').get(),
+              roomRef.collection('callerCandidates').get()
+            ]);
+
+            candidates.forEach(cs => cs.forEach(async c => {
+              await c.ref.delete();
+            }));
+
+            await roomRef.delete();
+          }
+
+          document.location.reload(true);
+        }}>挂断</Button>
       </CardActions>
     </Card>
   </>
