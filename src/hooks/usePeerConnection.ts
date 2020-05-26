@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import config from "../configs/iceServers";
-import {dbDocument} from "./useDatabase";
 
 const listen = (conn: RTCPeerConnection) => {
   conn.addEventListener("icegatheringstatechange", () =>

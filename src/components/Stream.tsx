@@ -32,7 +32,10 @@ const Stream: FC<Props> = ({ remote }) => {
   const getRoomRef = useRooms();
   const roomRef = getRoomRef();
 
-  useIceCandidate(roomRef, connection);
+  const {
+    calleeAddCandidates,
+    callerAddCandidates,
+  } = useIceCandidate(roomRef, connection);
   useEffect(() => {
     roomRef?.onSnapshot(async snapshot => {
       const result = snapshot.data();
@@ -57,7 +60,9 @@ const Stream: FC<Props> = ({ remote }) => {
         <Button
           size="small"
           onClick={async () => {
-            if (roomRef) {
+            if (roomRef && callerAddCandidates) {
+              callerAddCandidates();
+
               const { type, sdp } = await createOffer();
               await roomRef.set({ offer: { type, sdp } });
               setRoomId(roomRef.id);
@@ -71,7 +76,9 @@ const Stream: FC<Props> = ({ remote }) => {
           const roomRef = (await getRoomCollection()).doc(id);
           const roomSnapshot = await roomRef.get();
 
-          if(roomSnapshot.exists) {
+          if(roomSnapshot.exists && calleeAddCandidates) {
+            calleeAddCandidates();
+
             console.log('Got room:', roomSnapshot.exists);
             const offer = roomSnapshot.data()?.offer;
             console.log('Got offer:', offer);
