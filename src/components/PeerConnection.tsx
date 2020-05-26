@@ -40,6 +40,8 @@ export const PeerConnection: FC = ({ children }) => {
   return <PeerContext.Provider value={conn} children={children} />;
 };
 
+export default PeerConnection;
+
 export const useConnection = () => {
   const conn = useContext(PeerContext);
   return conn;
@@ -71,4 +73,43 @@ export const useStreamFromPeer = (setStreams: (ss: MediaStream[]) => void) => {
       setStreams(ss);
     });
   }, [conn, setStreams]);
+}
+
+export const useCreateOfferCallback = () => {
+  const conn = useContext(PeerContext);
+
+  return async () => {
+    const offer = await conn.createOffer();
+    await conn.setLocalDescription(offer);
+
+    console.log('[P2P] created offer:', offer);
+    return offer;
+  }
+};
+
+export const useAcceptOfferCallback = () => {
+  const conn = useContext(PeerContext);
+
+  return async (offer: RTCSessionDescriptionInit) => {
+    await conn.setRemoteDescription(new RTCSessionDescription(offer));
+    const answer = await conn.createAnswer();
+    console.log('[P2P] created answer', answer);
+
+    await conn.setLocalDescription(answer);
+
+    return answer;
+  };
+}
+
+export const useSetRemoteDescriptionCallback = () => {
+  const conn = useContext(PeerContext);
+
+  return async (data: RTCSessionDescriptionInit) => {
+    if (conn.currentRemoteDescription) {
+      console.log('[P2P] Got remote description', data);
+
+      const rtcSessionDescription = new RTCSessionDescription(data);
+      await conn.setRemoteDescription(rtcSessionDescription);
+    }
+  }
 }
