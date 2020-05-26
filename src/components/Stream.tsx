@@ -6,8 +6,8 @@ import CardMedia from "@material-ui/core/CardMedia";
 import Button from "@material-ui/core/Button";
 import Video from "./Video";
 import useUserMedia from "../hooks/useUserMedia";
-
-const createRoom = () => {};
+import usePeerConnection from "../hooks/usePeerConnection";
+import useDatabase from "../hooks/useDatabase";
 
 interface Props {
   remote?: boolean;
@@ -16,6 +16,8 @@ interface Props {
 const Stream: FC<Props> = ({ remote }) => {
   const { stream, getPermitted } = useUserMedia();
   const remoteStream = useMemo(() => new MediaStream(), []);
+  usePeerConnection(remoteStream);
+  useDatabase();
 
   return (
     <Card style={{ marginTop: "20px" }}>
@@ -28,7 +30,7 @@ const Stream: FC<Props> = ({ remote }) => {
         <Button size="small" onClick={() => getPermitted()}>
           打开摄像头&麦克风
         </Button>
-        <Button size="small" onClick={() => createRoom()}>
+        <Button size="small" onClick={() => null}>
           创建房间
         </Button>
         <Button size="small">加入房间</Button>
