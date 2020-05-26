@@ -7,27 +7,29 @@ import Button from "@material-ui/core/Button";
 import Video from "./Video";
 import useUserMedia from "../hooks/useUserMedia";
 import usePeerConnection from "../hooks/usePeerConnection";
-import useDatabase from "../hooks/useDatabase";
+import useIceCandidate from "../hooks/useIceCandidate";
+import { useRooms } from "../hooks/useDatabase";
 
 interface Props {
   remote?: boolean;
 }
 
 const Stream: FC<Props> = ({ remote }) => {
-  const { stream, getPermitted } = useUserMedia();
+  const { stream: localStream, setStream: setLocalStream } = useUserMedia();
   const remoteStream = useMemo(() => new MediaStream(), []);
-  usePeerConnection(remoteStream);
-  useDatabase();
+  const { connection } = usePeerConnection(localStream, remoteStream);
+  const roomRef = useRooms();
+  useIceCandidate(roomRef(), connection);
 
   return (
     <Card style={{ marginTop: "20px" }}>
       <CardHeader title={remote ? "remoteStream" : "localStream"} />
       <CardMedia style={{ height: 320 }}>
-        <Video stream={stream} />
+        <Video stream={localStream} />
         <Video stream={remoteStream} />
       </CardMedia>
       <CardActions>
-        <Button size="small" onClick={() => getPermitted()}>
+        <Button size="small" onClick={() => setLocalStream()}>
           打开摄像头&麦克风
         </Button>
         <Button size="small" onClick={() => null}>

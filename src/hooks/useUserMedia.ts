@@ -18,7 +18,7 @@ const useUserMedia = () => {
     setUserStream(setStream);
   };
 
-  return { stream, getPermitted };
+  return { stream, setStream: getPermitted };
 };
 
 export default useUserMedia;

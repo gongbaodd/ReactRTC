@@ -21,31 +21,41 @@ const listen = (conn: RTCPeerConnection) => {
   );
 };
 
-const usePeerConnection = (...streams: MediaStream[]) =>
+
+const usePeerConnection = (
+  localStream: null | MediaStream,
+  ...remoteStreams: MediaStream[]
+) =>
   useMemo(() => {
     const conn = new RTCPeerConnection(config);
+   
 
     console.log("create connection", config);
     listen(conn);
 
-    conn.addEventListener("track", event => {
-      console.log(`[P2P] Got remote track:`, event.streams[0]);
+    // upload local stream
+    localStream?.getTracks().forEach(track => conn.addTrack(track, localStream));
 
-      event.streams.forEach((s, streamIndex) =>
-        s.getTracks().forEach(track => {
-          if (streams[streamIndex]) {
-            console.log(
-              `[P2P] Add a track to the remoteStream:${
-                streams[streamIndex].id
-              }`,
-              track,
-            );
+    // conn.addEventListener("track", event => {
+    //   console.log(`[P2P] Got remote track:`, event.streams[0]);
 
-            streams[streamIndex].addTrack(track);
-          }
-        }),
-      );
-    });
-  }, [streams]);
+    //   event.streams.forEach((s, streamIndex) =>
+    //     s.getTracks().forEach(track => {
+    //       if (streams[streamIndex]) {
+    //         console.log(
+    //           `[P2P] Add a track to the remoteStream:${
+    //             streams[streamIndex].id
+    //           }`,
+    //           track,
+    //         );
+
+    //         streams[streamIndex].addTrack(track);
+    //       }
+    //     }),
+    //   );
+    // });
+
+    return {connection: conn};
+  }, [localStream, remoteStreams]);
 
 export default usePeerConnection;
