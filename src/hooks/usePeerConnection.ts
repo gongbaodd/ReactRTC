@@ -45,24 +45,23 @@ const usePeerConnection = (
     // upload local stream
     localStream?.getTracks().forEach(track => conn.addTrack(track, localStream));
 
-    // conn.addEventListener("track", event => {
-    //   console.log(`[P2P] Got remote track:`, event.streams[0]);
+    conn.addEventListener("track", event => {
+      console.log(`[P2P] Got remote track:`, event.streams[0]);
 
-    //   event.streams.forEach((s, streamIndex) =>
-    //     s.getTracks().forEach(track => {
-    //       if (streams[streamIndex]) {
-    //         console.log(
-    //           `[P2P] Add a track to the remoteStream:${
-    //             streams[streamIndex].id
-    //           }`,
-    //           track,
-    //         );
+      event.streams.forEach((s, streamIndex) =>
+        s.getTracks().forEach(track => {
+          if (remoteStreams[streamIndex]) {
+            const { id } = remoteStreams[streamIndex];
+            console.log(
+              `[P2P] Add a track to the remoteStream:${id}`,
+              track,
+            );
 
-    //         streams[streamIndex].addTrack(track);
-    //       }
-    //     }),
-    //   );
-    // });
+            remoteStreams[streamIndex].addTrack(track);
+          }
+        }),
+      );
+    });
 
     return {connection: conn, createOffer: createOffer(conn)};
   }, [localStream, remoteStreams]);
