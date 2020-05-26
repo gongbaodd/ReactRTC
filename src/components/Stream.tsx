@@ -4,7 +4,7 @@ import CardHeader from "@material-ui/core/CardHeader";
 import CardActions from "@material-ui/core/CardActions";
 import CardMedia from "@material-ui/core/CardMedia";
 import Button from "@material-ui/core/Button";
-import Video from "./Video";
+import { LocalVideo, RemoteVideo } from "./Video";
 import RoomDialog from "./RoomDialog";
 
 import useUserMedia from "../hooks/useUserMedia";
@@ -18,7 +18,7 @@ interface Props {
 
 const Stream: FC<Props> = ({ remote }) => {
   const [roomId, setRoomId] = useState("");
-  const { stream: localStream, setStream: setLocalStream } = useUserMedia();
+  const { stream: localStream } = useUserMedia();
   const [remoteStream] = useState(() => new MediaStream());
   const {
     connection,
@@ -50,13 +50,10 @@ const Stream: FC<Props> = ({ remote }) => {
     <Card style={{ marginTop: "20px" }}>
       <CardHeader title={roomId || remote ? "remoteStream" : "localStream"} />
       <CardMedia style={{ height: 320 }}>
-        <Video stream={localStream} />
-        <Video stream={remoteStream} />
+        <LocalVideo />
+        <RemoteVideo />
       </CardMedia>
       <CardActions>
-        <Button size="small" onClick={() => setLocalStream()}>
-          打开摄像头&麦克风
-        </Button>
         <Button
           size="small"
           onClick={async () => {

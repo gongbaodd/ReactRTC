@@ -1,5 +1,7 @@
-import { useMemo, useState } from "react";
+import React, { useMemo, useState, createContext, useContext, FC, useEffect } from "react";
 import config from "../configs/iceServers";
+
+const PeerContext = createContext<RTCPeerConnection | null>(null);
 
 const listen = (conn: RTCPeerConnection) => {
   conn.addEventListener("icegatheringstatechange", () =>
@@ -19,6 +21,16 @@ const listen = (conn: RTCPeerConnection) => {
       `[P2P] ICE connection state change: ${conn.iceConnectionState}`,
     ),
   );
+};
+
+export const PeerConnection: FC = ({ children }) => {
+  const [conn] = useState(() => {
+    const c =  new RTCPeerConnection(config);
+    console.log("create connection", config);
+    listen(c);
+    return c;
+  });
+  return <PeerContext.Provider value={conn} children={children}/>;
 };
 
 const createOffer = (conn: RTCPeerConnection) => async () => {
@@ -50,24 +62,33 @@ const setRemoteDescription = (conn: RTCPeerConnection) =>
     }
   }
 
+export const useStreamToPeer = (localStream: MediaStream) => {
+  const conn = useContext(PeerContext);
+  useEffect(() => {
+    localStream.getTracks().forEach(t => conn?.addTrack(t, localStream));
+  }, [localStream, conn]);
+}
+
+export const useStreamFromPeer = () => {
+  const conn = useContext(PeerContext);
+
+  useEffect(() => {
+
+  }, [conn]);
+}
 
 const usePeerConnection = (
   localStream: null | MediaStream,
   ...remoteStreams: MediaStream[]
 ) =>{
-  const [conn] = useState(() => {
-    const c = new RTCPeerConnection(config);
-    console.log("create connection", config);
-    listen(c);
-    return c;
-  });
+  const conn = useContext(PeerContext);
   
   return useMemo(() => {
     // upload local stream
-    localStream?.getTracks().forEach(track => conn.addTrack(track, localStream));
+    // localStream?.getTracks().forEach(track => conn?.addTrack(track, localStream));
 
     // download remote stream
-    conn.addEventListener("track", event => {
+    conn?.addEventListener("track", event => {
       console.log(`[P2P] Got remote track:`, event.streams[0]);
 
       event.streams.forEach((s, streamIndex) =>
