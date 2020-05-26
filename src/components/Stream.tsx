@@ -7,6 +7,8 @@ import Button from "@material-ui/core/Button";
 import Video from "./Video";
 import useUserMedia from "../hooks/useUserMedia";
 
+const createRoom = () => {};
+
 interface Props {
   remote?: boolean;
 }
@@ -26,8 +28,10 @@ const Stream: FC<Props> = ({ remote }) => {
         <Button size="small" onClick={() => getPermitted()}>
           打开摄像头&麦克风
         </Button>
+        <Button size="small" onClick={() => createRoom()}>
+          创建房间
+        </Button>
         <Button size="small">加入房间</Button>
-        <Button size="small">创建房间</Button>
         <Button size="small">挂断</Button>
       </CardActions>
     </Card>
