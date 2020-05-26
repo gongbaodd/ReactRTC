@@ -1,12 +1,8 @@
 {
-  "name": "react-ts",
+  "name": "reactrtc",
   "version": "1.0.0",
-  "description": "React and TypeScript example starter project",
-  "keywords": [
-    "typescript",
-    "react",
-    "starter"
-  ],
+  "description": "",
+  "keywords": [],
   "main": "src/index.tsx",
   "dependencies": {
     "@firebase/database": "0.6.3",
