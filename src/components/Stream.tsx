@@ -7,7 +7,6 @@ import Button from "@material-ui/core/Button";
 import { LocalVideo, RemoteVideo } from "./Video";
 import RoomDialog from "./RoomDialog";
 
-import useUserMedia from "../hooks/useUserMedia";
 import usePeerConnection from "../hooks/usePeerConnection";
 import useIceCandidate from "../hooks/useIceCandidate";
 import { useRooms, getRoomCollection } from "../hooks/useDatabase";
@@ -18,7 +17,7 @@ interface Props {
 
 const Stream: FC<Props> = ({ remote }) => {
   const [roomId, setRoomId] = useState("");
-  const { stream: localStream } = useUserMedia();
+  const [localStream] = useState(() => new MediaStream());
   const [remoteStream] = useState(() => new MediaStream());
   const {
     connection,
