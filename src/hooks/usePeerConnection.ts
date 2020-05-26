@@ -30,6 +30,15 @@ const createOffer = (conn: RTCPeerConnection) => async () => {
   return offer;
 };
 
+const setRemoteDescription = (conn: RTCPeerConnection) => async (data: RTCSessionDescriptionInit) => {
+  if (conn.currentRemoteDescription) {
+    console.log('[P2P] Got remote description', data);
+
+    const rtcSessionDescription = new RTCSessionDescription(data);
+    await conn.setRemoteDescription(rtcSessionDescription);
+  }
+}
+
 
 const usePeerConnection = (
   localStream: null | MediaStream,
@@ -45,6 +54,7 @@ const usePeerConnection = (
     // upload local stream
     localStream?.getTracks().forEach(track => conn.addTrack(track, localStream));
 
+    // download remote stream
     conn.addEventListener("track", event => {
       console.log(`[P2P] Got remote track:`, event.streams[0]);
 
@@ -63,7 +73,11 @@ const usePeerConnection = (
       );
     });
 
-    return {connection: conn, createOffer: createOffer(conn)};
+    return {
+      connection: conn, 
+      createOffer: createOffer(conn), 
+      setRemoteDescription: setRemoteDescription(conn),
+    };
   }, [localStream, remoteStreams]);
 
 export default usePeerConnection;

@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useState, useEffect } from "react";
 import Card from "@material-ui/core/Card";
 import CardHeader from "@material-ui/core/CardHeader";
 import CardActions from "@material-ui/core/CardActions";
@@ -18,12 +18,22 @@ const Stream: FC<Props> = ({ remote }) => {
   const [roomId, setRoomId] = useState("");
   const { stream: localStream, setStream: setLocalStream } = useUserMedia();
   const [remoteStream] = useState(() => new MediaStream());
-  const { connection, createOffer } = usePeerConnection(
+  const { connection, createOffer, setRemoteDescription } = usePeerConnection(
     localStream,
     remoteStream,
   );
   const getRoomRef = useRooms();
-  useIceCandidate(getRoomRef(), connection);
+  const roomRef = getRoomRef();
+
+  useIceCandidate(roomRef, connection);
+  useEffect(() => {
+    roomRef?.onSnapshot(async snapshot => {
+      const result = snapshot.data();
+      if (result && result.answer) {
+        await setRemoteDescription(result.answer);
+      }
+    });
+  }, [roomRef, setRemoteDescription]);
 
   return (
     <Card style={{ marginTop: "20px" }}>
@@ -39,7 +49,6 @@ const Stream: FC<Props> = ({ remote }) => {
         <Button
           size="small"
           onClick={async () => {
-            const roomRef = getRoomRef();
             if (roomRef) {
               const { type, sdp } = await createOffer();
               await roomRef.set({ offer: { type, sdp } });
