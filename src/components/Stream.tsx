@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useMemo } from "react";
 import Card from "@material-ui/core/Card";
 import CardHeader from "@material-ui/core/CardHeader";
 import CardActions from "@material-ui/core/CardActions";
@@ -13,13 +13,14 @@ interface Props {
 
 const Stream: FC<Props> = ({ remote }) => {
   const { stream, getPermitted } = useUserMedia();
+  const remoteStream = useMemo(() => new MediaStream(), []);
 
   return (
     <Card style={{ marginTop: "20px" }}>
       <CardHeader title={remote ? "remoteStream" : "localStream"} />
-      <CardMedia style={{ height: 200 }}>
+      <CardMedia style={{ height: 320 }}>
         <Video stream={stream} />
-        <Video stream={null} />
+        <Video stream={remoteStream} />
       </CardMedia>
       <CardActions>
         <Button size="small" onClick={() => getPermitted()}>
