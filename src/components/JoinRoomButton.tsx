@@ -20,9 +20,9 @@ const JoinRoomButton = () => {
   useEffect(() => {
     if (room) {
       acceptOffer(room.data()?.offer)
-        .then(
-          ({type, sdp}) => updateAnswer({ answer: { type, sdp } }),
-        )
+        .then(({type, sdp}) => {
+            updateAnswer({ answer: { type, sdp } });
+        })
     }
   }, [room, acceptOffer, updateAnswer]);
 

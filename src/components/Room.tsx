@@ -88,13 +88,22 @@ export const useUpdateRoomAnswerCallback = () => {
 export const useOnUpdateRoomAnswer = (callback: (init: Parameters<typeof updateRoomOfferAnswer>[1]['answer']) => Promise<void>) => {
   const room = useRoom();
 
-  useEffect(() => room?.onSnapshot(async snapshot => {
-    const result = await snapshot.data();
-    if (result && result.answer) {
+  useEffect(() => {
+    if (!room) {
+      console.log('[useOnUpdateRoomAnswer] no room');
+      return; 
+    }
+
+    console.log('[useOnUpdateRoomAnswer] got room', room);
+    room.onSnapshot(async snapshot => {
+      const result = await snapshot.data();
+      if (result && result.answer) {
         await callback(result.answer);
         console.log('[DB] Got room answer', result);
-    }
-  }), [room, callback]);
+      }
+    });
+
+  }, [room, callback]);
 };
 
 export const useUpdateLocalCandidateCallback = () => {
@@ -103,8 +112,8 @@ export const useUpdateLocalCandidateCallback = () => {
     if (!room) {
       throw new Error('Room needed');
     }
-      await updateCandidate(room, hostIs, init);
-      console.log('[DB] update local candidate', init);
+    await updateCandidate(room, hostIs, init);
+    console.log('[DB] update local candidate', init);
   },[room]);
 
   return callback;
@@ -115,8 +124,10 @@ export const useOnUpdateRemoteCandidate = (remoteIs: Collection | null, callback
   
   useEffect(() => {
     if (room && remoteIs) {
-      onCandidateUpdated(room, remoteIs, callback);
+      return onCandidateUpdated(room, remoteIs, callback);
     }
+
+    console.log("[useOnUpdateRemoteCandidate] no room/remoteIs provided", {room, remoteIs});
   }, [room, remoteIs, callback]);
 }
 
