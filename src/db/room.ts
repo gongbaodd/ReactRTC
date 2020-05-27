@@ -1,9 +1,11 @@
 import firebase from "firebase";
 
+type Firestore = firebase.firestore.Firestore;
+
 const COL_NAME = "rooms";
 
 export const createRoom = async (
-  db: firebase.firestore.Firestore,
+  db: Firestore,
   data: {
     offer: {
       type: RTCSessionDescriptionInit["type"];

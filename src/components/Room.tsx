@@ -25,6 +25,11 @@ const Room: FC = ({ children }) => {
 
 export default Room;
 
+export const useRoom = () => {
+  const { room } = useContext(RoomContext);
+  return room;
+};
+
 export const useNewRoomCallback = () => {
   const db = useDB();
   const { setRoom } = useContext(RoomContext);
