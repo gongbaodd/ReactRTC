@@ -1,4 +1,4 @@
-import React, { useState, FC, useContext } from "react";
+import React, { useState, FC, useContext, ReactNode } from "react";
 import { createContext } from "react";
 import Button from "@material-ui/core/Button";
 
@@ -36,6 +36,14 @@ const UserMedia: FC = ({ children }) => {
       </div>
     </div>
   );
+};
+
+interface ConsumerProps {
+  render: (stream: MediaStream) => ReactNode;
+}
+
+export const UserMediaConsumer: FC<ConsumerProps> = ({ render }) => {
+  return <UserMediaContext.Consumer>{render}</UserMediaContext.Consumer>;
 };
 
 export const useUserStream = () => {

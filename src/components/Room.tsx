@@ -4,10 +4,12 @@ import React, {
   useState,
   useContext,
   useEffect,
+  useCallback,
 } from "react";
 import firebase from "../utils/firebase";
 import { useDB } from "./DB";
 import { createRoom, getRoomById, updateRoomOfferAnswer } from "../db/room";
+import { Collection, updateCandidate, onCandidateUpdated } from "../db/candidates";
 
 type DocumentReference = firebase.firestore.DocumentReference<
   firebase.firestore.DocumentData
@@ -31,7 +33,7 @@ const Room: FC = ({ children }) => {
 
 export default Room;
 
-export const useRoom = () => {
+const useRoom = () => {
   const { room } = useContext(RoomContext);
   return room;
 };
@@ -84,3 +86,43 @@ export const useOnUpdateRoomAnswer = (callback: (init: Parameters<typeof updateR
     }
   }), [room, callback]);
 };
+
+export const useUpdateLocalCandidateCallback = () => {
+  const room = useRoom();
+  const callback = useCallback(async (hostIs: Collection, init: RTCIceCandidateInit) => {
+    if(room) {
+      await updateCandidate(room, hostIs, init);
+    }
+  },[room]);
+
+  return callback;
+}
+
+export const useOnUpdateRemoteCandidate = (remoteIs: Collection | null, callback:  (d: RTCIceCandidateInit) => void,) => {
+  const room = useRoom();
+  
+  useEffect(() => {
+    if (room && remoteIs) {
+      onCandidateUpdated(room, remoteIs, callback);
+    }
+  }, [room, remoteIs, callback]);
+}
+
+export const useCancelRoomCallback = () => {
+  const room = useRoom();
+  const callback = useCallback(async () => {
+    if (room) {
+
+      const caller = await room.collection(Collection.caller).get();
+      const callee = await room.collection(Collection.callee).get();
+
+      caller.forEach(async c => c.ref.delete());
+      callee.forEach(async c => c.ref.delete());
+
+      room.delete();
+    }
+    
+  }, [room]);
+
+  return callback;
+}

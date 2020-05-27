@@ -1,36 +1,22 @@
-import React, { FC, useState, useEffect } from "react";
+import React, { FC } from "react";
 import Card from "@material-ui/core/Card";
 import CardHeader from "@material-ui/core/CardHeader";
 import CardActions from "@material-ui/core/CardActions";
 import CardMedia from "@material-ui/core/CardMedia";
-import Button from "@material-ui/core/Button";
+
 import LocalVideo from "./LocalVideo";
 import RemoteVideo from "./RemoteVideo";
-import RoomDialog from "./RoomDialog";
 import CreateRoom from "./CreateRoomButton";
 import JoinRoom from "./JoinRoomButton";
+import HongUp from "./HangUpButton";
 
-import useIceCandidate from "../hooks/useIceCandidate";
-import { useRooms, getRoomCollection } from "../hooks/useDatabase";
-import { useRoom } from "./Room";
+interface Props {}
 
-interface Props {
-  remote?: boolean;
-}
-
-const Stream: FC<Props> = ({ remote }) => {
-  const [roomId, setRoomId] = useState("");
-  const [localStream] = useState(() => new MediaStream());
-  const [remoteStream] = useState(() => new MediaStream());
-  const getRoomRef = useRooms();
-  const roomRef = getRoomRef();
-
-  const room = useRoom();
-
+const Stream: FC<Props> = () => {
   return (
     <>
       <Card style={{ marginTop: "20px" }}>
-        <CardHeader title={room?.id || "hello"} />
+        <CardHeader title={"hello"} />
         <CardMedia style={{ height: 320 }}>
           <LocalVideo />
           <RemoteVideo />
@@ -38,30 +24,7 @@ const Stream: FC<Props> = ({ remote }) => {
         <CardActions>
           <CreateRoom />
           <JoinRoom />
-
-          <Button
-            size="small"
-            onClick={async () => {
-              if (roomId) {
-                // localStream?.getTracks().forEach(track => track.stop());
-                // remoteStream.getTracks().forEach(track => track.stop());
-                // connection.close();
-                // const roomRef = (await getRoomCollection()).doc(roomId);
-                // const candidates = await Promise.all([
-                //   roomRef.collection('calleeCandidates').get(),
-                //   roomRef.collection('callerCandidates').get()
-                // ]);
-                // candidates.forEach(cs => cs.forEach(async c => {
-                //   await c.ref.delete();
-                // }));
-                // await roomRef.delete();
-              }
-
-              document.location.reload(true);
-            }}
-          >
-            挂断
-          </Button>
+          <HongUp />
         </CardActions>
       </Card>
     </>

@@ -42,9 +42,28 @@ export const PeerConnection: FC = ({ children }) => {
 
 export default PeerConnection;
 
-export const useConnection = () => {
+export const useOnGetLocalCandidate = (updateCandidate: (init: RTCIceCandidateInit) => void) => {
   const conn = useContext(PeerContext);
-  return conn;
+  
+  useEffect(() => {
+    conn.addEventListener("icecandidate", ({ candidate }) => {
+      if (candidate) {
+        console.log("[P2P ICE local] Got candidate!", candidate);
+        updateCandidate(candidate.toJSON());
+        return;
+      }
+      console.log("[P2P ICE local] Got final candidate!");
+    });
+  }, [conn, updateCandidate]);
+}
+
+export const useUpdateRemoteCandidateCallback = () => {
+  const conn = useContext(PeerContext);
+  const callback = useCallback(async (data: RTCIceCandidateInit) => {
+    await conn.addIceCandidate(new RTCIceCandidate(data));
+  }, [conn]);
+
+  return callback;
 }
 
 export const useStreamToPeer = (localStream: MediaStream) => {
@@ -128,3 +147,12 @@ export const useSetRemoteDescriptionCallback = () => {
 
   return callback;
 }
+
+export const useHangUpCallback = () => {
+  const conn = useContext(PeerContext);
+  const callback = useCallback(async () => {
+    await conn.close();
+  }, [conn]);
+
+  return callback;
+};

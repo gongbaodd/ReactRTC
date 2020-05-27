@@ -5,9 +5,9 @@ import React, {
   useEffect,
   useContext,
 } from "react";
-import { Collection, onCandidateUpdated } from "../db/candidates";
-import { useConnection } from "./PeerConnection";
-import { useRoom } from "./Room";
+import { Collection } from "../db/candidates";
+import { useUpdateRemoteCandidateCallback } from "./PeerConnection";
+import { useOnUpdateRemoteCandidate } from "./Room";
 
 type DocumentReference = firebase.firestore.DocumentReference<
   firebase.firestore.DocumentData
@@ -30,17 +30,9 @@ const CandidateContext = createContext<CandidateValue>({
 const RemoteCandidates: FC = ({ children }) => {
   const [candidate, setCandidate] = useState<CandidateValue["candidate"]>(null);
   const [remoteIs, setRemoteIs] = useState<CandidateValue["remoteIs"]>(null);
+  const updateRemoteCandidate = useUpdateRemoteCandidateCallback();
 
-  const room = useRoom();
-  const conn = useConnection();
-
-  useEffect(() => {
-    if (remoteIs && conn && room) {
-      onCandidateUpdated(room, remoteIs, async data => {
-        await conn.addIceCandidate(new RTCIceCandidate(data));
-      });
-    }
-  }, [remoteIs, conn, room]);
+  useOnUpdateRemoteCandidate(remoteIs, updateRemoteCandidate);
 
   return (
     <CandidateContext.Provider

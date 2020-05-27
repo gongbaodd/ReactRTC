@@ -1,13 +1,13 @@
 import React, {
   createContext,
   useState,
-  useEffect,
   FC,
   useContext,
+  useCallback,
 } from "react";
-import { useConnection } from "./PeerConnection";
-import { useRoom } from "./Room";
-import { Collection, updateCandidate } from "../db/candidates";
+import { useOnGetLocalCandidate } from "./PeerConnection";
+import { Collection } from "../db/candidates";
+import { useUpdateLocalCandidateCallback } from "./Room";
 
 type DocumentReference = firebase.firestore.DocumentReference<
   firebase.firestore.DocumentData
@@ -30,21 +30,14 @@ const CandidateContext = createContext<CandidateValue>({
 const LocalCandidate: FC = ({ children }) => {
   const [candidate, setCandidate] = useState<CandidateValue["candidate"]>(null);
   const [hostIs, setHostIs] = useState<CandidateValue["hostIs"]>(null);
+  const updateCandidateByHost = useUpdateLocalCandidateCallback();
+  const updateCandidate = useCallback(
+    async (init: RTCIceCandidateInit) =>
+      hostIs && updateCandidateByHost(hostIs, init),
+    [hostIs, updateCandidateByHost],
+  );
 
-  const conn = useConnection();
-  const room = useRoom();
-  useEffect(() => {
-    if (room && conn && hostIs) {
-      conn.addEventListener("icecandidate", ({ candidate }) => {
-        if (candidate) {
-          console.log("[ICE local] Got candidate!", candidate);
-          updateCandidate(room, hostIs, candidate.toJSON());
-          return;
-        }
-        console.log("[ICE local] Got final candidate!");
-      });
-    }
-  }, [conn, room, hostIs]);
+  useOnGetLocalCandidate(updateCandidate);
 
   return (
     <CandidateContext.Provider

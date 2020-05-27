@@ -1,6 +1,8 @@
-import React, { useState, FC } from "react";
+import React, { useState, createContext, FC, ReactNode } from "react";
 import { useStreamFromPeer } from "./PeerConnection";
 import useVideoMedia from "../hooks/useVideoMedia";
+
+const RemoteStreamContext = createContext<MediaStream[]>([]);
 
 const InnerRemoteVideo: FC<{ stream: MediaStream }> = ({ stream }) => {
   const v = useVideoMedia(stream);
@@ -12,12 +14,25 @@ const RemoteVideo = () => {
   useStreamFromPeer(setStreams);
 
   return (
-    <>
-      {streams.map(s => (
-        <InnerRemoteVideo stream={s} />
-      ))}
-    </>
+    <RemoteStreamContext.Provider
+      value={streams}
+      children={
+        <>
+          {streams.map(s => (
+            <InnerRemoteVideo stream={s} />
+          ))}
+        </>
+      }
+    />
   );
 };
 
 export default RemoteVideo;
+
+interface RemoteProps {
+  render: (streams: MediaStream[]) => ReactNode;
+}
+
+export const RemoteStreamConsumer: FC<RemoteProps> = ({ render }) => {
+  return <RemoteStreamContext.Consumer>{render}</RemoteStreamContext.Consumer>;
+};
