@@ -20,7 +20,7 @@ const Stream: FC<Props> = () => {
   return (
     <Card style={{ marginTop: "20px" }}>
       <CardHeader title={roomId || "hello"} />
-      <CardMedia style={{ height: 320 }}>
+      <CardMedia style={{ height: 800 }}>
         <LocalVideo />
         <RemoteVideo />
       </CardMedia>

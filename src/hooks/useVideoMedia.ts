@@ -6,6 +6,7 @@ const useMedia = (stream: HTMLMediaElement["srcObject"]) => {
   useEffect(() => {
     if (v.current) {
       v.current.srcObject = stream;
+      v.current.autoplay = true;
     }
   }, [stream]);
 

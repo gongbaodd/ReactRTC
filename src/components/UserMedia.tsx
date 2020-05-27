@@ -17,22 +17,26 @@ const UserMediaContext = createContext<MediaStream>(new MediaStream());
 
 const UserMedia: FC = ({ children }) => {
   const [stream, setStream] = useState(() => new MediaStream());
+  const [showButton, setShowButton] = useState(true);
 
   return (
     <div style={{ position: "relative" }}>
       <UserMediaContext.Provider value={stream} children={children} />;
       <div style={buttonStyle}>
-        <Button
-          onClick={async () => {
-            const userStream = await navigator.mediaDevices.getUserMedia({
-              video: true,
-              audio: true,
-            });
-            setStream(userStream);
-          }}
-        >
-          打开摄像头&麦克风
-        </Button>
+        {showButton && (
+          <Button
+            onClick={async () => {
+              const userStream = await navigator.mediaDevices.getUserMedia({
+                video: true,
+                audio: true,
+              });
+              setStream(userStream);
+              setShowButton(false);
+            }}
+          >
+            打开摄像头&麦克风
+          </Button>
+        )}
       </div>
     </div>
   );

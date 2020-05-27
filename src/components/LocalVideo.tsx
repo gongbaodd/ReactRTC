@@ -22,9 +22,3 @@ export const LocalVideo: FC<LocalProps> = () => {
 };
 
 export default LocalVideo;
-
-interface RemoteProps {}
-
-export const RemoteVideo: FC<RemoteProps> = () => {
-  return <video style={{ backgroundColor: "grey" }} />;
-};
