@@ -28,9 +28,10 @@ const JoinRoomButton = () => {
 
   return <RoomDialog
     onJoinRoom={async id => {
+      await getUserMedia();
+
       const room = await getRoom(id);
       if (room.exists) {
-        await getUserMedia();
         setRoom(room);
         claimCallee();
       }

@@ -8,7 +8,17 @@ import React, {
 } from "react";
 import config from "../configs/iceServers";
 
-const PeerContext = createContext<RTCPeerConnection>(new RTCPeerConnection());
+interface ContextValue {
+  conn: RTCPeerConnection;
+  offer: null | RTCSessionDescriptionInit;
+  setOffer: (offer: RTCSessionDescriptionInit | null) => void;
+}
+
+const PeerContext = createContext<ContextValue>({
+  conn: new RTCPeerConnection(),
+  offer: null,
+  setOffer: () => {},
+});
 
 const listen = (conn: RTCPeerConnection) => {
   conn.addEventListener("icegatheringstatechange", () =>
@@ -41,15 +51,27 @@ export const PeerConnection: FC = ({ children }) => {
     listen(c);
     return c;
   });
-  return <PeerContext.Provider value={conn} children={children} />;
+  const [offer, setOffer] = useState<ContextValue["offer"]>(null);
+
+  return (
+    <PeerContext.Provider
+      value={{ conn, offer, setOffer }}
+      children={children}
+    />
+  );
 };
 
 export default PeerConnection;
 
+const useConnection = () => {
+  const { conn } = useContext(PeerContext);
+  return conn;
+};
+
 export const useOnGetLocalCandidate = (
   updateCandidate: (init: RTCIceCandidateInit) => void,
 ) => {
-  const conn = useContext(PeerContext);
+  const conn = useConnection();
 
   useEffect(() => {
     console.log("listening icecandidate", conn);
@@ -65,7 +87,7 @@ export const useOnGetLocalCandidate = (
 };
 
 export const useUpdateRemoteCandidateCallback = () => {
-  const conn = useContext(PeerContext);
+  const conn = useConnection();
   const callback = useCallback(
     async (data: RTCIceCandidateInit) => {
       await conn.addIceCandidate(new RTCIceCandidate(data));
@@ -78,17 +100,21 @@ export const useUpdateRemoteCandidateCallback = () => {
 };
 
 export const useStreamToPeer = (localStream: MediaStream) => {
-  const conn = useContext(PeerContext);
+  const conn = useConnection();
+  const { offer } = useContext(PeerContext);
+
   useEffect(() => {
-    localStream.getTracks().forEach(t => {
-      conn.addTrack(t, localStream);
-      console.log("[P2P] stream to peer", localStream);
-    });
-  }, [localStream, conn]);
+    if (offer) {
+      localStream.getTracks().forEach(t => {
+        conn.addTrack(t, localStream);
+        console.log("[P2P] stream to peer", localStream);
+      });
+    }
+  }, [localStream, conn, offer]);
 };
 
 export const useStreamFromPeer = (setStreams: (ss: MediaStream[]) => void) => {
-  const conn = useContext(PeerContext);
+  const conn = useConnection();
 
   useEffect(() => {
     conn.addEventListener("track", ({ streams: remoteStreams }) => {
@@ -106,7 +132,7 @@ export const useStreamFromPeer = (setStreams: (ss: MediaStream[]) => void) => {
 };
 
 export const useRemoteSessionDescriptionCallback = () => {
-  const conn = useContext(PeerContext);
+  const conn = useConnection();
   const callback = useCallback(
     async (init: RTCSessionDescriptionInit) => {
       await conn.setRemoteDescription(new RTCSessionDescription(init));
@@ -119,20 +145,23 @@ export const useRemoteSessionDescriptionCallback = () => {
 };
 
 export const useCreateOfferCallback = () => {
-  const conn = useContext(PeerContext);
+  const conn = useConnection();
+  const { setOffer } = useContext(PeerContext);
+
   const callback = useCallback(async () => {
     const offer = await conn.createOffer();
     await conn.setLocalDescription(offer);
-
     console.log("[P2P] created offer:", offer);
+    setOffer(offer);
+
     return offer;
-  }, [conn]);
+  }, [conn, setOffer]);
 
   return callback;
 };
 
 export const useAcceptOfferCallback = () => {
-  const conn = useContext(PeerContext);
+  const conn = useConnection();
   const setRemote = useRemoteSessionDescriptionCallback();
   const callback = useCallback(
     async (offer: RTCSessionDescriptionInit) => {
@@ -153,7 +182,7 @@ export const useAcceptOfferCallback = () => {
 };
 
 export const useSetRemoteDescriptionCallback = () => {
-  const conn = useContext(PeerContext);
+  const conn = useConnection();
   const callback = useCallback(
     async (data: RTCSessionDescriptionInit) => {
       if (conn.currentRemoteDescription) {
@@ -171,7 +200,7 @@ export const useSetRemoteDescriptionCallback = () => {
 };
 
 export const useHangUpCallback = () => {
-  const conn = useContext(PeerContext);
+  const conn = useConnection();
   const callback = useCallback(async () => {
     await conn.close();
     console.log("[P2P] connection closed");

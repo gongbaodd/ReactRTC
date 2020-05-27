@@ -22,7 +22,6 @@ const CreateRoom = () => {
       size="small"
       onClick={async () => {
         await getUserMedia();
-
         const { type, sdp } = await createOffer();
         const id = await newRoom({ offer: { type, sdp } });
         console.log("created Room " + id);
