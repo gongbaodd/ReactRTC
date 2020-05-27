@@ -19,7 +19,7 @@ const RemoteVideo = () => {
       children={
         <>
           {streams.map(s => (
-            <InnerRemoteVideo stream={s} />
+            <InnerRemoteVideo stream={s} key={s.id} />
           ))}
         </>
       }

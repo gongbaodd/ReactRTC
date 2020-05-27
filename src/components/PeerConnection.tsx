@@ -81,7 +81,7 @@ export const useUpdateRemoteCandidateCallback = () => {
   const callback = useCallback(
     async (data: RTCIceCandidateInit) => {
       await conn.addIceCandidate(new RTCIceCandidate(data));
-      console.log("[P2P] got remote Candidate", data);
+      // console.log("[P2P] got remote Candidate", data);
     },
     [conn],
   );
@@ -171,7 +171,7 @@ export const useSetRemoteDescriptionCallback = () => {
   const conn = useConnection();
   const callback = useCallback(
     async (data: RTCSessionDescriptionInit) => {
-      if (conn.currentRemoteDescription) {
+      if (!conn.currentRemoteDescription) {
         console.log("[P2P] Got remote description", data);
 
         const rtcSessionDescription = new RTCSessionDescription(data);

@@ -6,7 +6,9 @@ import { useAcceptOfferCallback } from "./PeerConnection";
 import { useUserMediaCallback } from "./UserMedia";
 import firebase from "../utils/firebase";
 
-type DocumentSnapshot = firebase.firestore.DocumentSnapshot<firebase.firestore.DocumentData>;
+type DocumentSnapshot = firebase.firestore.DocumentSnapshot<
+  firebase.firestore.DocumentData
+>;
 
 const JoinRoomButton = () => {
   const getRoom = useExistRoomCallback();
@@ -15,11 +17,10 @@ const JoinRoomButton = () => {
   const acceptOffer = useAcceptOfferCallback();
   const getUserMedia = useUserMediaCallback();
 
-  const [room, setRoom] = useState<null|DocumentSnapshot>(null);
+  const [room, setRoom] = useState<null | DocumentSnapshot>(null);
 
   useEffect(() => {
     if (room) {
-      console.log('++++++++Accept+Offer+++++++');
       acceptOffer(room.data()?.offer)
         .then(({type, sdp}) => {
             updateAnswer({ answer: { type, sdp } });
@@ -27,20 +28,21 @@ const JoinRoomButton = () => {
     }
   }, [room, acceptOffer, updateAnswer]);
 
-  return <RoomDialog
-    onJoinRoom={async id => {
+  return (
+    <RoomDialog
+      onJoinRoom={async id => {
+        const room = await getRoom(id);
+        if (room.exists) {
+          setRoom(room);
+          claimCallee();
 
-      const room = await getRoom(id);
-      if (room.exists) {
-        setRoom(room);
-        claimCallee();
+          await getUserMedia();
+        }
 
-        await getUserMedia();
-      }
-      
-      return room.exists;
-    }}
-  />;  
+        return room.exists;
+      }}
+    />
+  );
 };
 
 export default JoinRoomButton;
