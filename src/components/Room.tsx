@@ -49,6 +49,7 @@ export const useNewRoomCallback = () => {
 
   return async (data: Parameters<typeof createRoom>[1]) => {
     const room = await createRoom(db, data);
+    console.log('[DB] created room', room);
     setRoom(room);
     return room.id;
   };
@@ -60,6 +61,7 @@ export const useExistRoomCallback = () => {
 
   return async (id: string) => {
     const room = await getRoomById(db, id);
+    console.log('[DB] got room', room);
     const snapshot = await room.get();
 
     if (snapshot.exists) {
@@ -75,9 +77,11 @@ export const useUpdateRoomAnswerCallback = () => {
   const room = useRoom();
 
   return async (data: Parameters<typeof updateRoomOfferAnswer>[1]) => {
-    if (room) {
-      await updateRoomOfferAnswer(room, data);
+    if (!room) {
+      throw new Error('Room needed');
     }
+      await updateRoomOfferAnswer(room, data);
+      console.log('[DB] update room answer', data);
   };
 };
 
@@ -88,6 +92,7 @@ export const useOnUpdateRoomAnswer = (callback: (init: Parameters<typeof updateR
     const result = await snapshot.data();
     if (result && result.answer) {
         await callback(result.answer);
+        console.log('[DB] Got room answer', result);
     }
   }), [room, callback]);
 };
@@ -95,9 +100,11 @@ export const useOnUpdateRoomAnswer = (callback: (init: Parameters<typeof updateR
 export const useUpdateLocalCandidateCallback = () => {
   const room = useRoom();
   const callback = useCallback(async (hostIs: Collection, init: RTCIceCandidateInit) => {
-    if(room) {
-      await updateCandidate(room, hostIs, init);
+    if (!room) {
+      throw new Error('Room needed');
     }
+      await updateCandidate(room, hostIs, init);
+      console.log('[DB] update local candidate', init);
   },[room]);
 
   return callback;
@@ -116,7 +123,9 @@ export const useOnUpdateRemoteCandidate = (remoteIs: Collection | null, callback
 export const useCancelRoomCallback = () => {
   const room = useRoom();
   const callback = useCallback(async () => {
-    if (room) {
+    if (!room) {
+      throw new Error('Room needed');
+    }
 
       const caller = await room.collection(Collection.caller).get();
       const callee = await room.collection(Collection.callee).get();
@@ -125,7 +134,8 @@ export const useCancelRoomCallback = () => {
       callee.forEach(async c => c.ref.delete());
 
       room.delete();
-    }
+
+      console.log('[DB] delete room');
     
   }, [room]);
 

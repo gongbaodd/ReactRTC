@@ -61,6 +61,7 @@ export const useUpdateRemoteCandidateCallback = () => {
   const conn = useContext(PeerContext);
   const callback = useCallback(async (data: RTCIceCandidateInit) => {
     await conn.addIceCandidate(new RTCIceCandidate(data));
+    console.log('[P2P] got remote Candidate', data);
   }, [conn]);
 
   return callback;
@@ -71,8 +72,8 @@ export const useStreamToPeer = (localStream: MediaStream) => {
   useEffect(() => {
     localStream.getTracks().forEach(t => {
       conn?.addTrack(t, localStream);
+      console.log('[P2P] stream to peer', localStream);
     });
-    console.log('[P2P] stream to peer', localStream);
   }, [localStream, conn]);
 }
 
@@ -81,7 +82,7 @@ export const useStreamFromPeer = (setStreams: (ss: MediaStream[]) => void) => {
 
   useEffect(() => {
     conn.addEventListener("track", ({ streams: remoteStreams }) => {
-      console.log("[RemoteStream] Got remote track:", remoteStreams);
+      console.log("[P2P RemoteStream] Got remote track:", remoteStreams);
 
       const ss = remoteStreams.map(rs => {
         const s = new MediaStream();
@@ -97,8 +98,8 @@ export const useStreamFromPeer = (setStreams: (ss: MediaStream[]) => void) => {
 export const useRemoteSessionDescriptionCallback = () => {
   const conn = useContext(PeerContext);
   const callback = useCallback(async (init: RTCSessionDescriptionInit) => {
-    console.log('[P2P] got remote session description');
     await conn.setRemoteDescription(new RTCSessionDescription(init));
+    console.log('[P2P] got remote session description', init);
   }, [conn]);
 
   return callback;
@@ -121,12 +122,13 @@ export const useAcceptOfferCallback = () => {
   const conn = useContext(PeerContext);
   const setRemote = useRemoteSessionDescriptionCallback();
   const callback = useCallback(async (offer: RTCSessionDescriptionInit) => {
-    console.log('[P2P] got offer');
+    console.log('[P2P] got offer', offer);
     await setRemote(offer);
     const answer = await conn.createAnswer();
-    console.log('[P2P] created answer', answer);
 
+    console.log('[P2P] created answer', answer);
     await conn.setLocalDescription(answer);
+    console.log('[P2P] setLocalDescription', answer);
 
     return answer;
   }, [conn, setRemote])
@@ -142,6 +144,7 @@ export const useSetRemoteDescriptionCallback = () => {
 
       const rtcSessionDescription = new RTCSessionDescription(data);
       await conn.setRemoteDescription(rtcSessionDescription);
+      console.log('[P2P] setRemoteDescription', rtcSessionDescription);
     }
   }, [conn]);
 
@@ -152,6 +155,7 @@ export const useHangUpCallback = () => {
   const conn = useContext(PeerContext);
   const callback = useCallback(async () => {
     await conn.close();
+    console.log('[P2P] connection closed');
   }, [conn]);
 
   return callback;

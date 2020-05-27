@@ -48,6 +48,7 @@ export const onCandidateUpdated = (
         `[ICE remote] Got remote ICE candidate: ${JSON.stringify(data)}`,
       );
       callback(data);
+      console.log('[DB] Got remote candidate', data);
     }
   });
 });

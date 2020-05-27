@@ -26,7 +26,7 @@ const HangUpButton = () => {
                     await hangup();
                     await cancelRoom();
 
-                    document.location.reload(true);
+                    // document.location.reload(true);
                   }}
                 >
                   挂断

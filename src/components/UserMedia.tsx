@@ -63,7 +63,7 @@ export const setUserMedia = async (
 ) => {
   const userStream = await navigator.mediaDevices.getUserMedia({
     video: true,
-    audio: true,
+    audio: false,
   });
   console.log("Got user stream", userStream);
   setStream(userStream);

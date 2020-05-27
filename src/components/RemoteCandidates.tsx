@@ -2,7 +2,6 @@ import React, {
   createContext,
   useState,
   FC,
-  useEffect,
   useContext,
 } from "react";
 import { Collection } from "../db/candidates";
