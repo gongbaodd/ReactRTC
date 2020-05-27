@@ -1,37 +1,29 @@
 import React, { createContext, FC, useState, useContext } from "react";
 import firebase from "../utils/firebase";
+import { createRoom } from "../db/room";
 
-class RoomData {
-  async getCollection() {
-    const db = firebase.firestore();
-    const collection = await db.collection("rooms");
+type FireStore = firebase.firestore.Firestore;
 
-    return collection;
-  }
-}
-
-const RoomContext = createContext<RoomData>(new RoomData());
+const DbContext = createContext<FireStore>(firebase.firestore());
 
 const DB: FC = ({ children }) => {
-  const [roomData] = useState(() => new RoomData());
+  const [db] = useState(() => firebase.firestore());
 
-  return <RoomContext.Provider value={roomData} children={children} />;
+  return <DbContext.Provider value={db} children={children} />;
 };
 
 export default DB;
 
-export const useNewRoomCallback = () => {
-  const roomData = useContext(RoomContext);
+export const useDB = () => {
+  const db = useContext(DbContext);
+  return db;
+};
 
-  return async (data: {
-    offer: {
-      type: RTCSessionDescriptionInit["type"];
-      sdp: RTCSessionDescriptionInit["sdp"];
-    };
-  }) => {
-    const col = await roomData.getCollection();
-    const room = await col.doc();
-    room.set(data);
+export const useNewRoomCallback = () => {
+  const db = useContext(DbContext);
+
+  return async (data: Parameters<typeof createRoom>[1]) => {
+    const room = await createRoom(db, data);
     return room.id;
   };
 };

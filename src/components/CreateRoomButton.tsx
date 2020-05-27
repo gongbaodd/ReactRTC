@@ -1,7 +1,7 @@
 import React from "react";
 import Button from "@material-ui/core/Button";
 import { useCreateOfferCallback } from "./PeerConnection";
-import { useNewRoomCallback } from "./DB";
+import { useNewRoomCallback } from "./Room";
 
 const CreateRoom = () => {
   const createOffer = useCreateOfferCallback();

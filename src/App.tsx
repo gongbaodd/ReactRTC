@@ -4,13 +4,16 @@ import Container from "@material-ui/core/Container";
 import Stream from "./components/Stream";
 import PeerConnection from "./components/PeerConnection";
 import DB from "./components/DB";
+import Room from "./components/Room";
 
 export default function App() {
   return (
     <Container className="App">
       <DB>
         <PeerConnection>
-          <Stream />
+          <Room>
+            <Stream />
+          </Room>
         </PeerConnection>
       </DB>
     </Container>
