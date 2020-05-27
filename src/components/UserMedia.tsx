@@ -1,4 +1,4 @@
-import React, { useState, FC, useContext, ReactNode } from "react";
+import React, { useState, FC, useContext, ReactNode, useCallback } from "react";
 import { createContext } from "react";
 
 const defaultMediaStream = new MediaStream();
@@ -42,6 +42,20 @@ export const UserMediaConsumer: FC<ConsumerProps> = ({ render }) => {
 export const useUserStream = () => {
   const { stream } = useContext(UserMediaContext);
   return stream;
+};
+
+export const useUserMediaCallback = () => {
+  const { setStream } = useContext(UserMediaContext);
+  const callback = useCallback(async () => {
+    const userStream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: true,
+    });
+    console.log("Got user stream", userStream);
+    setStream(userStream);
+  }, [setStream]);
+
+  return callback;
 };
 
 export const setUserMedia = async (
