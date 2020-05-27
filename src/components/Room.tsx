@@ -38,6 +38,11 @@ const useRoom = () => {
   return room;
 };
 
+export const useRoomId = () => {
+  const {room} = useContext(RoomContext);
+  return room?.id;
+};
+
 export const useNewRoomCallback = () => {
   const db = useDB();
   const { setRoom } = useContext(RoomContext);
