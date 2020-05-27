@@ -19,6 +19,7 @@ const JoinRoomButton = () => {
 
   useEffect(() => {
     if (room) {
+      console.log('++++++++Accept+Offer+++++++');
       acceptOffer(room.data()?.offer)
         .then(({type, sdp}) => {
             updateAnswer({ answer: { type, sdp } });
@@ -28,13 +29,15 @@ const JoinRoomButton = () => {
 
   return <RoomDialog
     onJoinRoom={async id => {
-      await getUserMedia();
 
       const room = await getRoom(id);
       if (room.exists) {
         setRoom(room);
         claimCallee();
+
+        await getUserMedia();
       }
+      
       return room.exists;
     }}
   />;  

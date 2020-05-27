@@ -10,14 +10,10 @@ import config from "../configs/iceServers";
 
 interface ContextValue {
   conn: RTCPeerConnection;
-  offer: null | RTCSessionDescriptionInit;
-  setOffer: (offer: RTCSessionDescriptionInit | null) => void;
 }
 
 const PeerContext = createContext<ContextValue>({
   conn: new RTCPeerConnection(),
-  offer: null,
-  setOffer: () => {},
 });
 
 const listen = (conn: RTCPeerConnection) => {
@@ -51,14 +47,8 @@ export const PeerConnection: FC = ({ children }) => {
     listen(c);
     return c;
   });
-  const [offer, setOffer] = useState<ContextValue["offer"]>(null);
 
-  return (
-    <PeerContext.Provider
-      value={{ conn, offer, setOffer }}
-      children={children}
-    />
-  );
+  return <PeerContext.Provider value={{ conn }} children={children} />;
 };
 
 export default PeerConnection;
@@ -101,16 +91,13 @@ export const useUpdateRemoteCandidateCallback = () => {
 
 export const useStreamToPeer = (localStream: MediaStream) => {
   const conn = useConnection();
-  const { offer } = useContext(PeerContext);
 
   useEffect(() => {
-    if (offer) {
-      localStream.getTracks().forEach(t => {
-        conn.addTrack(t, localStream);
-        console.log("[P2P] stream to peer", localStream);
-      });
-    }
-  }, [localStream, conn, offer]);
+    localStream.getTracks().forEach(t => {
+      conn.addTrack(t, localStream);
+      console.log("[P2P] stream to peer", localStream);
+    });
+  }, [localStream, conn]);
 };
 
 export const useStreamFromPeer = (setStreams: (ss: MediaStream[]) => void) => {
@@ -146,16 +133,14 @@ export const useRemoteSessionDescriptionCallback = () => {
 
 export const useCreateOfferCallback = () => {
   const conn = useConnection();
-  const { setOffer } = useContext(PeerContext);
 
   const callback = useCallback(async () => {
     const offer = await conn.createOffer();
     await conn.setLocalDescription(offer);
     console.log("[P2P] created offer:", offer);
-    setOffer(offer);
 
     return offer;
-  }, [conn, setOffer]);
+  }, [conn]);
 
   return callback;
 };
@@ -167,6 +152,7 @@ export const useAcceptOfferCallback = () => {
     async (offer: RTCSessionDescriptionInit) => {
       console.log("[P2P] got offer", offer);
       await setRemote(offer);
+
       const answer = await conn.createAnswer();
 
       console.log("[P2P] created answer", answer);
