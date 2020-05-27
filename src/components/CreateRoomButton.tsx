@@ -2,12 +2,12 @@ import React from "react";
 import Button from "@material-ui/core/Button";
 import { useCreateOfferCallback } from "./PeerConnection";
 import { useNewRoomCallback } from "./Room";
-import { useCallerCandidateCallback } from "./LocalCandidates";
+import { useClaimCallerCallback } from "../hooks/useCandidateCallback";
 
 const CreateRoom = () => {
   const createOffer = useCreateOfferCallback();
   const newRoom = useNewRoomCallback();
-  const claimCaller = useCallerCandidateCallback();
+  const claimCaller = useClaimCallerCallback();
 
   return (
     <Button

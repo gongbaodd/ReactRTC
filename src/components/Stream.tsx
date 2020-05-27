@@ -10,6 +10,7 @@ import RoomDialog from "./RoomDialog";
 
 import useIceCandidate from "../hooks/useIceCandidate";
 import { useRooms, getRoomCollection } from "../hooks/useDatabase";
+import { useRoom } from "./Room";
 
 interface Props {
   remote?: boolean;
@@ -21,6 +22,8 @@ const Stream: FC<Props> = ({ remote }) => {
   const [remoteStream] = useState(() => new MediaStream());
   const getRoomRef = useRooms();
   const roomRef = getRoomRef();
+
+  const room = useRoom();
 
   // const {
   //   calleeAddCandidates,
@@ -38,7 +41,7 @@ const Stream: FC<Props> = ({ remote }) => {
   return (
     <>
       <Card style={{ marginTop: "20px" }}>
-        <CardHeader title={roomId || remote ? "remoteStream" : "localStream"} />
+        <CardHeader title={room?.id || "hello"} />
         <CardMedia style={{ height: 320 }}>
           <LocalVideo />
           <RemoteVideo />

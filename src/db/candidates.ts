@@ -35,3 +35,19 @@ export const updateCandidate = async (
 ) => {
   await getCandidateRef(room, hostIs)?.add(data);
 };
+
+export const onCandidateUpdated = (
+  room: DocumentReference,
+  remoteIs: Collection,
+  callback: (d: RTCIceCandidateInit) => void,
+) => getCandidateRef(room, remoteIs)?.onSnapshot(snapshot => {
+  snapshot.docChanges().forEach(change => {
+    if (change.type === "added") {
+      const data = change.doc.data();
+      console.log(
+        `[ICE remote] Got remote ICE candidate: ${JSON.stringify(data)}`,
+      );
+      callback(data);
+    }
+  });
+});

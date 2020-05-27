@@ -6,6 +6,7 @@ import PeerConnection from "./components/PeerConnection";
 import DB from "./components/DB";
 import Room from "./components/Room";
 import LocalCandidate from "./components/LocalCandidates";
+import RemoteCandidate from "./components/RemoteCandidates";
 
 export default function App() {
   return (
@@ -14,7 +15,9 @@ export default function App() {
         <PeerConnection>
           <Room>
             <LocalCandidate>
-              <Stream />
+              <RemoteCandidate>
+                <Stream />
+              </RemoteCandidate>
             </LocalCandidate>
           </Room>
         </PeerConnection>

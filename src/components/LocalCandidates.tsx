@@ -54,14 +54,8 @@ const LocalCandidate: FC = ({ children }) => {
   );
 };
 
-export const useCallerCandidateCallback = () => {
-  const { setHostIs } = useContext(CandidateContext);
-  return () => setHostIs(Collection.caller);
-};
-
-export const useCalleeCandidateCallback = () => {
-  const { setHostIs } = useContext(CandidateContext);
-  return () => setHostIs(Collection.callee);
-};
-
 export default LocalCandidate;
+
+export const useLocalCandidateContext = () => {
+  return useContext(CandidateContext);
+};
