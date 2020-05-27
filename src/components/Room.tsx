@@ -124,6 +124,7 @@ export const useOnUpdateRemoteCandidate = (remoteIs: Collection | null, callback
   
   useEffect(() => {
     if (room && remoteIs) {
+      console.log("[useOnUpdateRemoteCandidate] ok", {room, remoteIs});
       return onCandidateUpdated(room, remoteIs, callback);
     }
 

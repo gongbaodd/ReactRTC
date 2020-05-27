@@ -1,4 +1,4 @@
-const config: RTCConfiguration = {
+const configuration = {
   iceServers: [
     {
       urls: ["stun:stun1.l.google.com:19302", "stun:stun2.l.google.com:19302"],
@@ -7,4 +7,4 @@ const config: RTCConfiguration = {
   iceCandidatePoolSize: 10,
 };
 
-export default config;
+export default configuration;

@@ -21,12 +21,13 @@ const CreateRoom = () => {
     <Button
       size="small"
       onClick={async () => {
+        await getUserMedia();
+
         const { type, sdp } = await createOffer();
-        claimCaller();
         const id = await newRoom({ offer: { type, sdp } });
         console.log("created Room " + id);
 
-        await getUserMedia();
+        claimCaller();
       }}
     >
       创建房间

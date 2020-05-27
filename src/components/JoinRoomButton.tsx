@@ -30,9 +30,9 @@ const JoinRoomButton = () => {
     onJoinRoom={async id => {
       const room = await getRoom(id);
       if (room.exists) {
-        claimCallee();
-        setRoom(room);
         await getUserMedia();
+        setRoom(room);
+        claimCallee();
       }
       return room.exists;
     }}
