@@ -12,7 +12,7 @@ export const useClaimCallerCallback = () => {
   };
 };
 
-export const useCalleeCandidateCallback = () => {
+export const useClaimCalleeCallback = () => {
   const { setHostIs } = useLocalCandidateContext();
   const { setRemoteIs } = useRemoteCandidateContext();
 

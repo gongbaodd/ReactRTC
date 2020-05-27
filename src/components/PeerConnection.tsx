@@ -74,6 +74,15 @@ export const useStreamFromPeer = (setStreams: (ss: MediaStream[]) => void) => {
   }, [conn, setStreams]);
 }
 
+export const useRemoteSessionDescriptionCallback = () => {
+  const conn = useContext(PeerContext);
+
+  return async (init: RTCSessionDescriptionInit) => {
+    console.log('[P2P] got remote session description');
+    await conn.setRemoteDescription(new RTCSessionDescription(init));
+  };
+};
+
 export const useCreateOfferCallback = () => {
   const conn = useContext(PeerContext);
 
@@ -88,9 +97,11 @@ export const useCreateOfferCallback = () => {
 
 export const useAcceptOfferCallback = () => {
   const conn = useContext(PeerContext);
+  const setRemote = useRemoteSessionDescriptionCallback();
 
   return async (offer: RTCSessionDescriptionInit) => {
-    await conn.setRemoteDescription(new RTCSessionDescription(offer));
+    console.log('[P2P] got offer');
+    await setRemote(offer);
     const answer = await conn.createAnswer();
     console.log('[P2P] created answer', answer);
 

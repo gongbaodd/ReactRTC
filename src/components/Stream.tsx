@@ -7,6 +7,8 @@ import Button from "@material-ui/core/Button";
 import LocalVideo from "./LocalVideo";
 import RemoteVideo from "./RemoteVideo";
 import RoomDialog from "./RoomDialog";
+import CreateRoom from "./CreateRoomButton";
+import JoinRoom from "./JoinRoomButton";
 
 import useIceCandidate from "../hooks/useIceCandidate";
 import { useRooms, getRoomCollection } from "../hooks/useDatabase";
@@ -47,40 +49,9 @@ const Stream: FC<Props> = ({ remote }) => {
           <RemoteVideo />
         </CardMedia>
         <CardActions>
-          <Button
-            size="small"
-            onClick={async () => {
-              // if (roomRef && callerAddCandidates) {
-              //   callerAddCandidates();
-              //   const { type, sdp } = await createOffer();
-              //   await roomRef.set({ offer: { type, sdp } });
-              //   setRoomId(roomRef.id);
-              //   console.log("created Room " + roomRef.id);
-              // }
-            }}
-          >
-            创建房间
-          </Button>
-          <RoomDialog
-            onJoinRoom={async id => {
-              const roomRef = (await getRoomCollection()).doc(id);
-              const roomSnapshot = await roomRef.get();
+          <CreateRoom />
+          <JoinRoom />
 
-              // if(roomSnapshot.exists && calleeAddCandidates) {
-              //   calleeAddCandidates();
-
-              //   console.log('Got room:', roomSnapshot.exists);
-              //   setRoomId(id);
-
-              //   const offer = roomSnapshot.data()?.offer;
-              //   console.log('Got offer:', offer);
-              //   const answer = await acceptOffer(offer);
-              //   await roomRef.update({ answer: {type: answer.type, sdp: answer.sdp} });
-              // }
-
-              return roomSnapshot.exists;
-            }}
-          />
           <Button
             size="small"
             onClick={async () => {

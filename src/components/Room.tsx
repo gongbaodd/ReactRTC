@@ -1,7 +1,13 @@
-import React, { createContext, FC, useState, useContext } from "react";
+import React, {
+  createContext,
+  FC,
+  useState,
+  useContext,
+  useEffect,
+} from "react";
 import firebase from "../utils/firebase";
 import { useDB } from "./DB";
-import { createRoom } from "../db/room";
+import { createRoom, getRoomById, updateRoomOfferAnswer } from "../db/room";
 
 type DocumentReference = firebase.firestore.DocumentReference<
   firebase.firestore.DocumentData
@@ -39,4 +45,42 @@ export const useNewRoomCallback = () => {
     setRoom(room);
     return room.id;
   };
+};
+
+export const useExistRoomCallback = () => {
+  const db = useDB();
+  const { setRoom } = useContext(RoomContext);
+
+  return async (id: string) => {
+    const room = await getRoomById(db, id);
+    const snapshot = await room.get();
+
+    if (snapshot.exists) {
+      console.log("Got room:", snapshot);
+      setRoom(room);
+    }
+
+    return snapshot;
+  };
+};
+
+export const useUpdateRoomAnswerCallback = () => {
+  const room = useRoom();
+
+  return async (data: Parameters<typeof updateRoomOfferAnswer>[1]) => {
+    if (room) {
+      await updateRoomOfferAnswer(room, data);
+    }
+  };
+};
+
+export const useOnUpdateRoomAnser = (callback: (init: Parameters<typeof updateRoomOfferAnswer>[1]) => Promise<void>) => {
+  const room = useRoom();
+
+  useEffect(() => room?.onSnapshot(async snapshot => {
+    const result = await snapshot.data();
+    if (result && result.answer) {
+        await callback(result.answer);
+    }
+  }), [room, callback]);
 };
