@@ -74,7 +74,7 @@ export const useUpdateRoomAnswerCallback = () => {
   };
 };
 
-export const useOnUpdateRoomAnser = (callback: (init: Parameters<typeof updateRoomOfferAnswer>[1]) => Promise<void>) => {
+export const useOnUpdateRoomAnswer = (callback: (init: Parameters<typeof updateRoomOfferAnswer>[1]['answer']) => Promise<void>) => {
   const room = useRoom();
 
   useEffect(() => room?.onSnapshot(async snapshot => {

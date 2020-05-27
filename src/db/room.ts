@@ -7,7 +7,7 @@ type DocumentReference = firebase.firestore.DocumentReference<
 
 const COL_NAME = "rooms";
 
-interface RoomData {
+export interface RoomData {
   offer: {
     type: RTCSessionDescriptionInit["type"];
     sdp: RTCSessionDescriptionInit["sdp"];

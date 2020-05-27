@@ -4,6 +4,7 @@ import React, {
   useContext,
   FC,
   useEffect,
+  useCallback,
 } from "react";
 import config from "../configs/iceServers";
 
@@ -76,30 +77,31 @@ export const useStreamFromPeer = (setStreams: (ss: MediaStream[]) => void) => {
 
 export const useRemoteSessionDescriptionCallback = () => {
   const conn = useContext(PeerContext);
-
-  return async (init: RTCSessionDescriptionInit) => {
+  const callback = useCallback(async (init: RTCSessionDescriptionInit) => {
     console.log('[P2P] got remote session description');
     await conn.setRemoteDescription(new RTCSessionDescription(init));
-  };
+  }, [conn]);
+
+  return callback;
 };
 
 export const useCreateOfferCallback = () => {
   const conn = useContext(PeerContext);
-
-  return async () => {
+  const callback = useCallback(async () => {
     const offer = await conn.createOffer();
     await conn.setLocalDescription(offer);
 
     console.log('[P2P] created offer:', offer);
     return offer;
-  }
+  }, [conn]);
+
+  return callback; 
 };
 
 export const useAcceptOfferCallback = () => {
   const conn = useContext(PeerContext);
   const setRemote = useRemoteSessionDescriptionCallback();
-
-  return async (offer: RTCSessionDescriptionInit) => {
+  const callback = useCallback(async (offer: RTCSessionDescriptionInit) => {
     console.log('[P2P] got offer');
     await setRemote(offer);
     const answer = await conn.createAnswer();
@@ -108,18 +110,21 @@ export const useAcceptOfferCallback = () => {
     await conn.setLocalDescription(answer);
 
     return answer;
-  };
+  }, [conn, setRemote])
+
+  return callback;
 }
 
 export const useSetRemoteDescriptionCallback = () => {
   const conn = useContext(PeerContext);
-
-  return async (data: RTCSessionDescriptionInit) => {
+  const callback = useCallback(async (data: RTCSessionDescriptionInit) => {
     if (conn.currentRemoteDescription) {
       console.log('[P2P] Got remote description', data);
 
       const rtcSessionDescription = new RTCSessionDescription(data);
       await conn.setRemoteDescription(rtcSessionDescription);
     }
-  }
+  }, [conn]);
+
+  return callback;
 }

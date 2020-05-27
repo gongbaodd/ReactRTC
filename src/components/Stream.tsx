@@ -27,19 +27,6 @@ const Stream: FC<Props> = ({ remote }) => {
 
   const room = useRoom();
 
-  // const {
-  //   calleeAddCandidates,
-  //   callerAddCandidates,
-  // } = useIceCandidate(roomRef, connection);
-  // useEffect(() => {
-  //   roomRef?.onSnapshot(async snapshot => {
-  //     const result = snapshot.data();
-  //     if (result && result.answer) {
-  //       await setRemoteDescription(result.answer);
-  //     }
-  //   });
-  // }, [roomRef, setRemoteDescription]);
-
   return (
     <>
       <Card style={{ marginTop: "20px" }}>

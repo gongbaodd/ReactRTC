@@ -1,13 +1,19 @@
 import React from "react";
 import Button from "@material-ui/core/Button";
-import { useCreateOfferCallback } from "./PeerConnection";
-import { useNewRoomCallback } from "./Room";
+import {
+  useCreateOfferCallback,
+  useSetRemoteDescriptionCallback,
+} from "./PeerConnection";
+import { useNewRoomCallback, useOnUpdateRoomAnswer } from "./Room";
 import { useClaimCallerCallback } from "../hooks/useCandidateCallback";
 
 const CreateRoom = () => {
   const createOffer = useCreateOfferCallback();
   const newRoom = useNewRoomCallback();
   const claimCaller = useClaimCallerCallback();
+  const setRemote = useSetRemoteDescriptionCallback();
+
+  useOnUpdateRoomAnswer(setRemote);
 
   return (
     <Button
