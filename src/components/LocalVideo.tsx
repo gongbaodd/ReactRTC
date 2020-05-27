@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import { useStreamToPeer } from "./PeerConnection";
 import useVideoMedia from "../hooks/useVideoMedia";
-import UserMedia, { useUserStream } from "./UserMedia";
+import { useUserStream } from "./UserMedia";
 
 interface LocalProps {}
 
@@ -14,11 +14,7 @@ const InnerLocalVideo = () => {
 };
 
 export const LocalVideo: FC<LocalProps> = () => {
-  return (
-    <UserMedia>
-      <InnerLocalVideo />
-    </UserMedia>
-  );
+  return <InnerLocalVideo />;
 };
 
 export default LocalVideo;

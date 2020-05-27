@@ -70,9 +70,9 @@ export const useStreamToPeer = (localStream: MediaStream) => {
   const conn = useContext(PeerContext);
   useEffect(() => {
     localStream.getTracks().forEach(t => {
-      console.log('[P2P] stream to peer');
       conn?.addTrack(t, localStream);
     });
+    console.log('[P2P] stream to peer', localStream);
   }, [localStream, conn]);
 }
 

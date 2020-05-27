@@ -7,21 +7,24 @@ import DB from "./components/DB";
 import Room from "./components/Room";
 import LocalCandidate from "./components/LocalCandidates";
 import RemoteCandidate from "./components/RemoteCandidates";
+import UserMedia from "./components/UserMedia";
 
 export default function App() {
   return (
     <Container className="App">
-      <DB>
-        <PeerConnection>
-          <Room>
-            <LocalCandidate>
-              <RemoteCandidate>
-                <Stream />
-              </RemoteCandidate>
-            </LocalCandidate>
-          </Room>
-        </PeerConnection>
-      </DB>
+      <UserMedia>
+        <DB>
+          <PeerConnection>
+            <Room>
+              <LocalCandidate>
+                <RemoteCandidate>
+                  <Stream />
+                </RemoteCandidate>
+              </LocalCandidate>
+            </Room>
+          </PeerConnection>
+        </DB>
+      </UserMedia>
     </Container>
   );
 }

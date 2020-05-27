@@ -1,58 +1,58 @@
 import React, { useState, FC, useContext, ReactNode } from "react";
 import { createContext } from "react";
-import Button from "@material-ui/core/Button";
 
-const buttonStyle = {
-  position: "absolute",
-  top: 0,
-  left: 0,
-  bottom: 0,
-  right: 0,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-} as const;
+const defaultMediaStream = new MediaStream();
 
-const UserMediaContext = createContext<MediaStream>(new MediaStream());
+interface UserMediaContextValue {
+  stream: MediaStream;
+  setStream: (s: MediaStream) => void;
+}
+
+const UserMediaContext = createContext<UserMediaContextValue>({
+  stream: defaultMediaStream,
+  setStream: () => {},
+});
 
 const UserMedia: FC = ({ children }) => {
-  const [stream, setStream] = useState(() => new MediaStream());
-  const [showButton, setShowButton] = useState(true);
+  const [stream, setStream] = useState(() => defaultMediaStream);
 
   return (
-    <div style={{ position: "relative" }}>
-      <UserMediaContext.Provider value={stream} children={children} />;
-      <div style={buttonStyle}>
-        {showButton && (
-          <Button
-            onClick={async () => {
-              const userStream = await navigator.mediaDevices.getUserMedia({
-                video: true,
-                audio: true,
-              });
-              setStream(userStream);
-              setShowButton(false);
-            }}
-          >
-            打开摄像头&麦克风
-          </Button>
-        )}
-      </div>
-    </div>
+    <UserMediaContext.Provider
+      value={{ stream, setStream }}
+      children={children}
+    />
   );
 };
 
 interface ConsumerProps {
-  render: (stream: MediaStream) => ReactNode;
+  render: (
+    stream: MediaStream,
+    setStream: UserMediaContextValue["setStream"],
+  ) => ReactNode;
 }
 
 export const UserMediaConsumer: FC<ConsumerProps> = ({ render }) => {
-  return <UserMediaContext.Consumer>{render}</UserMediaContext.Consumer>;
+  return (
+    <UserMediaContext.Consumer>
+      {({ stream, setStream }) => stream && render(stream, setStream)}
+    </UserMediaContext.Consumer>
+  );
 };
 
 export const useUserStream = () => {
-  const stream = useContext(UserMediaContext);
+  const { stream } = useContext(UserMediaContext);
   return stream;
+};
+
+export const setUserMedia = async (
+  setStream: UserMediaContextValue["setStream"],
+) => {
+  const userStream = await navigator.mediaDevices.getUserMedia({
+    video: true,
+    audio: true,
+  });
+  console.log("Got user stream", userStream);
+  setStream(userStream);
 };
 
 export default UserMedia;
