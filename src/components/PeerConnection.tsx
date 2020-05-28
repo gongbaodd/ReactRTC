@@ -150,10 +150,10 @@ export const useAcceptOfferCallback = () => {
   const setRemote = useRemoteSessionDescriptionCallback();
   const callback = useCallback(
     async (offer: RTCSessionDescriptionInit) => {
-      const answer = await conn.createAnswer();
-
       console.log("[P2P] got offer", offer);
       await setRemote(offer);
+
+      const answer = await conn.createAnswer();
 
       console.log("[P2P] created answer", answer);
       await conn.setLocalDescription(answer);
