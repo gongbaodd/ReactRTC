@@ -11,29 +11,54 @@ import { listenConnection } from "../utils/listeners";
 
 interface ContextValue {
   conn: RTCPeerConnection;
-  channel: RTCDataChannel | null;
+  sender: RTCDataChannel | null;
+  receiver: RTCDataChannel | null,
 }
 
 const PeerContext = createContext<ContextValue>({
   conn: new RTCPeerConnection(),
-  channel: null,
+  sender: null,
+  receiver: null,
 });
 
 export const PeerConnection: FC = ({ children }) => {
+  const [receiver, setReceiver] = useState<ContextValue["receiver"]>(null);
   const [conn] = useState(() => {
     const c = new RTCPeerConnection(config);
     console.log("create connection", config);
     listenConnection(c);
+    c.addEventListener('datachannel', ({ channel }) => {
+      channel.addEventListener('open', () => {
+        console.log('[P2P receiver] open');
+        setReceiver(channel);
+      });
+      channel.addEventListener("message", e => {
+        console.error('[P2P receiver] message', e);
+      });
+      channel.addEventListener('close', () => {
+        console.log('[P2P receiver] closed');
+        setReceiver(null);
+      });
+    });
     return c;
   });
-  const [channel, setChannel] = useState<ContextValue["channel"]>(() => {
-    const c = conn.createDataChannel("message");
-    c.addEventListener("open", () => setChannel(c));
-    c.addEventListener("close", () => setChannel(null));
+  const [sender, setChannel] = useState<ContextValue["sender"]>(() => {
+    const c = conn.createDataChannel("send");
+    c.addEventListener("open", () => {
+      console.log('[P2P sender] open');
+      setChannel(c);
+    });
+    c.addEventListener("message", e => {
+      console.error('[P2P sender] message', e);
+    });
+    c.addEventListener("close", () => {
+      console.log('[P2P sender] closed');      
+      setChannel(null);
+    });
     return null;
   });
 
-  return <PeerContext.Provider value={{ conn, channel }} children={children} />;
+  return <PeerContext.Provider value={{ conn, sender, receiver }} children={children} />;
 };
 
 export default PeerConnection;
@@ -44,25 +69,25 @@ const useConnection = () => {
 };
 
 export const useSendMessageCallback = () => {
-  const { channel } = useContext(PeerContext);
+  const { sender } = useContext(PeerContext);
   const callback = useCallback(
     (message: string) => {
-      channel?.send(message);
+      sender?.send(message);
     },
-    [channel],
+    [sender],
   );
 
   return callback;
 };
 
 export const useOnMessage = (callback: (m: string) => void) => {
-  const { channel } = useContext(PeerContext);
+  const { receiver } = useContext(PeerContext);
 
   useEffect(() => {
-    channel?.addEventListener("message", event => {
+    receiver?.addEventListener("message", event => {
       callback(event.data);
     });
-  }, [channel, callback]);
+  }, [receiver, callback]);
 };
 
 export const useOnGetLocalCandidate = (

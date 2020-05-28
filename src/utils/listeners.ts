@@ -1,4 +1,20 @@
 export const listenConnection = (conn: RTCPeerConnection) => {
+  conn.addEventListener("datachannel", e => {
+    console.error("[P2P] datachannel", e);
+    const { channel } = e;
+    channel.onopen = () => {
+      console.error("channel open");
+    };
+
+    channel.onmessage = e => {
+      console.error("message", e);
+    };
+
+    channel.onclose = () => {
+      console.error("channel close");
+    };
+  });
+
   conn.addEventListener("icegatheringstatechange", () =>
     console.log(
       `[listen P2P] ICE gathering state changed: ${conn.iceGatheringState}`,
