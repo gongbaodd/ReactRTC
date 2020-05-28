@@ -25,7 +25,7 @@ const RoomDialog: FC<Props> = ({ onJoinRoom, onClosed }) => {
         加入房间
       </Button>
       <Dialog open={open} onExited={() => onClosed()}>
-        <DialogTitle>Join a room</DialogTitle>n{" "}
+        <DialogTitle>Join a room</DialogTitle>
         <DialogContent>
           <TextField
             label="room id"
