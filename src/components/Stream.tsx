@@ -10,6 +10,8 @@ import CreateRoom from "./CreateRoomButton";
 import JoinRoom from "./JoinRoomButton";
 import HongUp from "./HangUpButton";
 
+import Message from "./Message";
+
 import { useRoomId } from "./Room";
 
 interface Props {}
@@ -18,18 +20,21 @@ const Stream: FC<Props> = () => {
   const roomId = useRoomId();
 
   return (
-    <Card style={{ marginTop: "20px" }}>
-      <CardHeader title={roomId || "hello"} />
-      <CardMedia style={{ height: 800 }}>
-        <LocalVideo />
-        <RemoteVideo />
-      </CardMedia>
-      <CardActions>
-        <CreateRoom />
-        <JoinRoom />
-        <HongUp />
-      </CardActions>
-    </Card>
+    <>
+      <Card style={{ marginTop: "20px" }}>
+        <CardHeader title={roomId || "hello"} />
+        <CardMedia style={{ height: 800 }}>
+          <LocalVideo />
+          <RemoteVideo />
+        </CardMedia>
+        <CardActions>
+          <CreateRoom />
+          <JoinRoom />
+          <HongUp />
+        </CardActions>
+      </Card>
+      <Message />
+    </>
   );
 };
 

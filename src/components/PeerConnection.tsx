@@ -47,7 +47,7 @@ export const useSendMessageCallback = () => {
   const { channel } = useContext(PeerContext);
   const callback = useCallback(
     (message: string) => {
-      channel.send(message);
+      channel?.send(message);
     },
     [channel],
   );
@@ -59,7 +59,7 @@ export const useOnMessage = (callback: (m: string) => void) => {
   const { channel } = useContext(PeerContext);
 
   useEffect(() => {
-    channel.addEventListener("message", event => {
+    channel?.addEventListener("message", event => {
       callback(event.data);
     });
   }, [channel, callback]);
