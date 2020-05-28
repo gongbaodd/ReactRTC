@@ -7,48 +7,33 @@ import React, {
   useCallback,
 } from "react";
 import config from "../configs/iceServers";
+import { listenConnection } from "../utils/listeners";
 
 interface ContextValue {
   conn: RTCPeerConnection;
+  channel: RTCDataChannel | null;
 }
 
 const PeerContext = createContext<ContextValue>({
   conn: new RTCPeerConnection(),
+  channel: null,
 });
-
-const listen = (conn: RTCPeerConnection) => {
-  conn.addEventListener("icegatheringstatechange", () =>
-    console.log(
-      `[listen P2P] ICE gathering state changed: ${conn.iceGatheringState}`,
-    ),
-  );
-
-  conn.addEventListener("connectionstatechange", () =>
-    console.log(
-      `[listen P2P] Connection state change: ${conn.connectionState}`,
-    ),
-  );
-
-  conn.addEventListener("signalingstatechange", () => {
-    console.log(`[listen P2P] Signaling state change: ${conn.signalingState}`);
-  });
-
-  conn.addEventListener("iceconnectionstatechange", () =>
-    console.log(
-      `[listen P2P] ICE connection state change: ${conn.iceConnectionState}`,
-    ),
-  );
-};
 
 export const PeerConnection: FC = ({ children }) => {
   const [conn] = useState(() => {
     const c = new RTCPeerConnection(config);
     console.log("create connection", config);
-    listen(c);
+    listenConnection(c);
     return c;
   });
+  const [channel, setChannel] = useState<ContextValue["channel"]>(() => {
+    const c = conn.createDataChannel("message");
+    c.addEventListener("open", () => setChannel(c));
+    c.addEventListener("close", () => setChannel(null));
+    return null;
+  });
 
-  return <PeerContext.Provider value={{ conn }} children={children} />;
+  return <PeerContext.Provider value={{ conn, channel }} children={children} />;
 };
 
 export default PeerConnection;
@@ -56,6 +41,28 @@ export default PeerConnection;
 const useConnection = () => {
   const { conn } = useContext(PeerContext);
   return conn;
+};
+
+export const useSendMessageCallback = () => {
+  const { channel } = useContext(PeerContext);
+  const callback = useCallback(
+    (message: string) => {
+      channel.send(message);
+    },
+    [channel],
+  );
+
+  return callback;
+};
+
+export const useOnMessage = (callback: (m: string) => void) => {
+  const { channel } = useContext(PeerContext);
+
+  useEffect(() => {
+    channel.addEventListener("message", event => {
+      callback(event.data);
+    });
+  }, [channel, callback]);
 };
 
 export const useOnGetLocalCandidate = (
