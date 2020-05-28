@@ -29,9 +29,9 @@ const listen = (conn: RTCPeerConnection) => {
     ),
   );
 
-  conn.addEventListener("signalingstatechange", () =>
-    console.log(`[listen P2P] Signaling state change: ${conn.signalingState}`),
-  );
+  conn.addEventListener("signalingstatechange", () => {
+    console.log(`[listen P2P] Signaling state change: ${conn.signalingState}`);
+  });
 
   conn.addEventListener("iceconnectionstatechange", () =>
     console.log(
@@ -64,14 +64,14 @@ export const useOnGetLocalCandidate = (
   const conn = useConnection();
 
   useEffect(() => {
-    console.log("listening icecandidate", conn);
+    // console.log("listening icecandidate", conn);
     conn.addEventListener("icecandidate", event => {
       if (event.candidate) {
-        console.log("[P2P ICE local] Got candidate!", event.candidate);
+        // console.log("[P2P ICE local] Got candidate!", event.candidate);
         updateCandidate(event.candidate.toJSON());
         return;
       }
-      console.log("[P2P ICE local] Got final candidate!", event);
+      // console.log("[P2P ICE local] Got final candidate!", event);
     });
   }, [conn, updateCandidate]);
 };
@@ -150,10 +150,10 @@ export const useAcceptOfferCallback = () => {
   const setRemote = useRemoteSessionDescriptionCallback();
   const callback = useCallback(
     async (offer: RTCSessionDescriptionInit) => {
+      const answer = await conn.createAnswer();
+
       console.log("[P2P] got offer", offer);
       await setRemote(offer);
-
-      const answer = await conn.createAnswer();
 
       console.log("[P2P] created answer", answer);
       await conn.setLocalDescription(answer);

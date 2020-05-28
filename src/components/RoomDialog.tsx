@@ -8,9 +8,10 @@ import DialogContent from "@material-ui/core/DialogContent";
 
 interface Props {
   onJoinRoom: (id: string) => Promise<boolean>;
+  onClosed: () => Promise<void>;
 }
 
-const RoomDialog: FC<Props> = ({ onJoinRoom }) => {
+const RoomDialog: FC<Props> = ({ onJoinRoom, onClosed }) => {
   const [open, setOpen] = useState(false);
   const [id, setId] = useState("");
 
@@ -23,8 +24,8 @@ const RoomDialog: FC<Props> = ({ onJoinRoom }) => {
       <Button size="small" onClick={() => setOpen(true)}>
         加入房间
       </Button>
-      <Dialog open={open}>
-        <DialogTitle>Join a room</DialogTitle>
+      <Dialog open={open} onExited={() => onClosed()}>
+        <DialogTitle>Join a room</DialogTitle>n{" "}
         <DialogContent>
           <TextField
             label="room id"

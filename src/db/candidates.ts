@@ -10,12 +10,12 @@ export enum Collection {
 }
 
 const getCallerRef = (room: DocumentReference) => {
-  console.log("[DB] get caller collection");
+  // console.log("[DB] get caller collection");
   return room.collection(Collection.caller);
 };
 
 const getCalleeRef = (room: DocumentReference) => {
-  console.log("[DB] get callee collection");
+  // console.log("[DB] get callee collection");
   return room.collection(Collection.callee);
 };
 
@@ -48,11 +48,11 @@ export const onCandidateUpdated = (
     snapshot.docChanges().forEach(change => {
       if (change.type === "added") {
         const data = change.doc.data();
-        console.log(
-          `[ICE remote] Got remote ICE candidate: ${JSON.stringify(data)}`,
-        );
+        // console.log(
+        //   `[ICE remote] Got remote ICE candidate: ${JSON.stringify(data)}`,
+        // );
         callback(data);
-        console.log("[DB] Got remote candidate", data);
+        // console.log("[DB] Got remote candidate", data);
       }
     });
   });

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import RoomDialog from "./RoomDialog";
 import { useExistRoomCallback, useUpdateRoomAnswerCallback } from "./Room";
 import { useClaimCalleeCallback } from "../hooks/useCandidateCallback";
@@ -17,16 +17,8 @@ const JoinRoomButton = () => {
   const acceptOffer = useAcceptOfferCallback();
   const getUserMedia = useUserMediaCallback();
 
-  const [room, setRoom] = useState<null | DocumentSnapshot>(null);
 
-  useEffect(() => {
-    if (room) {
-      acceptOffer(room.data()?.offer)
-        .then(({type, sdp}) => {
-            updateAnswer({ answer: { type, sdp } });
-        })
-    }
-  }, [room, acceptOffer, updateAnswer]);
+  const [room, setRoom] = useState<null | DocumentSnapshot>(null);
 
   return (
     <RoomDialog
@@ -34,13 +26,22 @@ const JoinRoomButton = () => {
         const room = await getRoom(id);
         if (room.exists) {
           setRoom(room);
-          claimCallee();
-
-          await getUserMedia();
         }
 
         return room.exists;
       }}
+      onClosed={
+        async () => {
+          if (room) {
+            await getUserMedia();
+
+            const { type, sdp } = await acceptOffer(room.data()?.offer);
+            await updateAnswer({ answer: { type, sdp } });
+            
+            claimCallee();
+          }
+        }
+      }
     />
   );
 };

@@ -34,10 +34,10 @@ const LocalCandidate: FC = ({ children }) => {
   const updateCandidate = useCallback(
     async (init: RTCIceCandidateInit) => {
       if (!hostIs) {
-        console.log("[updateCandidate] hostIs not provided!");
+        // console.log("[updateCandidate] hostIs not provided!");
         return;
       }
-      console.log("[updateCandidate] hostIs done", hostIs);
+      // console.log("[updateCandidate] hostIs done", hostIs);
       await updateCandidateByHost(hostIs, init);
     },
     [hostIs, updateCandidateByHost],

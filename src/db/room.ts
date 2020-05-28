@@ -33,7 +33,7 @@ export const updateRoomOfferAnswer = async (
   room: DocumentReference,
   data: Pick<RoomData, "answer">,
 ) => {
-  console.log("[DB.updateEoomOfferAnswer]", data);
+  // console.log("[DB.updateRoomOfferAnswer]", data);
   await room.update(data);
 };
 

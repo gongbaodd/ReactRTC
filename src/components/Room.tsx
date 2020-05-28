@@ -90,7 +90,7 @@ export const useOnUpdateRoomAnswer = (callback: (init: Parameters<typeof updateR
 
   useEffect(() => {
     if (!room) {
-      console.log('[useOnUpdateRoomAnswer] no room');
+      // console.log('[useOnUpdateRoomAnswer] no room');
       return; 
     }
 
@@ -113,7 +113,7 @@ export const useUpdateLocalCandidateCallback = () => {
       throw new Error('Room needed');
     }
     await updateCandidate(room, hostIs, init);
-    console.log('[DB] update local candidate', init);
+    // console.log('[DB] update local candidate', init);
   },[room]);
 
   return callback;
@@ -124,11 +124,11 @@ export const useOnUpdateRemoteCandidate = (remoteIs: Collection | null, callback
   
   useEffect(() => {
     if (room && remoteIs) {
-      console.log("[useOnUpdateRemoteCandidate] ok", {room, remoteIs});
+      // console.log("[useOnUpdateRemoteCandidate] ok", {room, remoteIs});
       return onCandidateUpdated(room, remoteIs, callback);
     }
 
-    console.log("[useOnUpdateRemoteCandidate] no room/remoteIs provided", {room, remoteIs});
+    // console.log("[useOnUpdateRemoteCandidate] no room/remoteIs provided", {room, remoteIs});
   }, [room, remoteIs, callback]);
 }
 
